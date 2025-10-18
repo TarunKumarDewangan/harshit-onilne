@@ -32,9 +32,9 @@ class VehicleTaxController extends Controller
     {
         $data = $request->validate([
             'vehicle_type' => 'nullable|string|max:50',
-            'tax_mode' => 'required|string|max:50',
-            'tax_from' => 'required|date',
-            'tax_upto' => 'required|date|after_or_equal:tax_from',
+            'tax_mode' => 'nullable|string|max:50',
+            'tax_from' => 'sometimes|nullable|date',
+            'tax_upto' => 'required|date', // This remains required
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'amount' => 'nullable|numeric|between:0,99999999.99',
         ]);
@@ -52,10 +52,10 @@ class VehicleTaxController extends Controller
     public function update(Request $request, VehicleTax $tax)
     {
         $data = $request->validate([
-            'vehicle_type' => 'sometimes|required|string|max:50',
-            'tax_mode' => 'sometimes|required|string|max:50',
-            'tax_from' => 'sometimes|required|date',
-            'tax_upto' => 'sometimes|required|date|after_or_equal:tax_from',
+            'vehicle_type' => 'nullable|string|max:50',
+            'tax_mode' => 'nullable|string|max:50',
+            'tax_from' => 'sometimes|nullable|date',
+            'tax_upto' => 'required|date',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'amount' => 'nullable|numeric|between:0,99999999.99',
         ]);

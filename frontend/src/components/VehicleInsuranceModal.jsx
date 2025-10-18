@@ -3,9 +3,6 @@ import { Modal, Button, Table, Form, Row, Col, Alert, Spinner, Badge } from 'rea
 import { toast } from 'react-toastify';
 import api from '../services/apiClient';
 
-// --- FIX: The formatDate function is no longer needed here ---
-// const formatDate = (dateString) => { ... };
-
 export default function VehicleInsuranceModal({ show, onHide, vehicle, onShowEdit }) {
   const [items, setItems] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -18,7 +15,7 @@ export default function VehicleInsuranceModal({ show, onHide, vehicle, onShowEdi
     policy_number: '',
     start_date: '',
     end_date: '',
-    status: 'active',
+    status: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -42,7 +39,7 @@ export default function VehicleInsuranceModal({ show, onHide, vehicle, onShowEdi
   useEffect(() => {
     if (show) {
       load(1);
-      setForm({ insurance_type: '', company_name: '', policy_number: '', start_date: '', end_date: '', status: 'active' });
+      setForm({ insurance_type: '', company_name: '', policy_number: '', start_date: '', end_date: '', status: '' });
     }
   }, [show, vehicle]);
 
@@ -53,9 +50,24 @@ export default function VehicleInsuranceModal({ show, onHide, vehicle, onShowEdi
     setSaving(true);
     setErr('');
     try {
-      await api.post(`/vehicles/${vehicle.id}/insurances`, form);
-      toast.success('Insurance record added.');
-      load(1);
+        // --- START OF THE FIX ---
+        // Create a new payload object to send to the API.
+        const payload = { ...form };
+
+        // Go through each key in the payload. If the value is an empty string,
+        // change it to null so the database will accept it.
+        Object.keys(payload).forEach(key => {
+            if (payload[key] === '') {
+                payload[key] = null;
+            }
+        });
+
+        // Send the cleaned payload instead of the original form state.
+        await api.post(`/vehicles/${vehicle.id}/insurances`, payload);
+        // --- END OF THE FIX ---
+
+        toast.success('Insurance record added.');
+        load(1);
     } catch (e) {
       const msg = e?.response?.data?.message || 'Failed to save insurance.';
       setErr(msg);
@@ -98,13 +110,12 @@ export default function VehicleInsuranceModal({ show, onHide, vehicle, onShowEdi
               {!loading && items.map((ins, i) => (
                 <tr key={ins.id}>
                   <td>{(meta?.from ?? 1) + i}</td>
-                  <td>{ins.policy_number}</td>
-                  <td>{ins.company_name}</td>
-                  <td>{ins.insurance_type}</td>
-                  {/* --- FIX: Display the pre-formatted date directly from the API --- */}
+                  <td>{ins.policy_number || '-'}</td>
+                  <td>{ins.company_name || '-'}</td>
+                  <td>{ins.insurance_type || '-'}</td>
                   <td>{ins.start_date || '-'}</td>
                   <td>{ins.end_date || '-'}</td>
-                  <td><Badge bg={ins.status === 'active' ? 'success' : 'danger'}>{ins.status}</Badge></td>
+                  <td><Badge bg={ins.status === 'active' ? 'success' : 'danger'}>{ins.status || 'N/A'}</Badge></td>
                   <td>
                     <Button variant="outline-primary" size="sm" className="me-1" onClick={() => onShowEdit(ins)}>Edit</Button>
                     <Button variant="outline-danger" size="sm" onClick={() => handleDelete(ins.id)}>Delete</Button>
@@ -118,10 +129,28 @@ export default function VehicleInsuranceModal({ show, onHide, vehicle, onShowEdi
         <h5 className="mb-3">Add New Insurance</h5>
         <Form onSubmit={submit}>
           <Row className="g-3">
-            <Col md={6}><Form.Group><Form.Label>Insurance Company *</Form.Label><Form.Control value={form.company_name} onChange={e => updateForm('company_name', e.target.value)} required /></Form.Group></Col>
-            <Col md={6}><Form.Group><Form.Label>Policy Number *</Form.Label><Form.Control value={form.policy_number} onChange={e => updateForm('policy_number', e.target.value.toUpperCase())} required /></Form.Group></Col>
-            <Col md={6}><Form.Group><Form.Label>Insurance Type *</Form.Label><Form.Select value={form.insurance_type} onChange={e => updateForm('insurance_type', e.target.value)}><option value="">-- Select --</option><option value="Comprehensive">Comprehensive</option><option value="Third Party">Third Party</option></Form.Select></Form.Group></Col>
-            <Col md={6}><Form.Group><Form.Label>Status *</Form.Label><Form.Select value={form.status} onChange={e => updateForm('status', e.target.value)}><option value="active">Active</option><option value="expired">Expired</option></Form.Select></Form.Group></Col>
+            <Col md={6}><Form.Group><Form.Label>Insurance Company</Form.Label><Form.Control value={form.company_name} onChange={e => updateForm('company_name', e.target.value)} /></Form.Group></Col>
+            <Col md={6}><Form.Group><Form.Label>Policy Number</Form.Label><Form.Control value={form.policy_number} onChange={e => updateForm('policy_number', e.target.value.toUpperCase())} /></Form.Group></Col>
+            <Col md={6}>
+                <Form.Group>
+                    <Form.Label>Insurance Type</Form.Label>
+                    <Form.Select value={form.insurance_type} onChange={e => updateForm('insurance_type', e.target.value)}>
+                        <option value="">-- Select --</option>
+                        <option value="Comprehensive">Comprehensive</option>
+                        <option value="Third Party">Third Party</option>
+                    </Form.Select>
+                </Form.Group>
+            </Col>
+            <Col md={6}>
+                <Form.Group>
+                    <Form.Label>Status</Form.Label>
+                    <Form.Select value={form.status} onChange={e => updateForm('status', e.target.value)}>
+                        <option value="">-- Select Status --</option>
+                        <option value="active">Active</option>
+                        <option value="expired">Expired</option>
+                    </Form.Select>
+                </Form.Group>
+            </Col>
             <Col md={6}><Form.Group><Form.Label>Start Date *</Form.Label><Form.Control type="date" value={form.start_date} onChange={e => updateForm('start_date', e.target.value)} required /></Form.Group></Col>
             <Col md={6}><Form.Group><Form.Label>End Date *</Form.Label><Form.Control type="date" value={form.end_date} onChange={e => updateForm('end_date', e.target.value)} required /></Form.Group></Col>
           </Row>

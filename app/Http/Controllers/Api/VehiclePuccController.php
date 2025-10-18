@@ -29,10 +29,10 @@ class VehiclePuccController extends Controller
     public function storeForVehicle(Request $request, Vehicle $vehicle)
     {
         $data = $request->validate([
-            'pucc_number' => 'required|string|max:255|unique:vehicle_puccs,pucc_number',
-            'valid_from' => 'required|date',
-            'valid_until' => 'required|date|after_or_equal:valid_from',
-            'status' => 'required|string|in:active,expired',
+            'pucc_number' => 'nullable|string|max:255|unique:vehicle_puccs,pucc_number',
+            'valid_from' => 'nullable|date',
+            'valid_until' => 'required|date', // This remains required
+            'status' => 'nullable|string|in:active,expired',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -49,10 +49,10 @@ class VehiclePuccController extends Controller
     public function update(Request $request, VehiclePucc $pucc)
     {
         $data = $request->validate([
-            'pucc_number' => ['required', 'string', 'max:255', Rule::unique('vehicle_puccs')->ignore($pucc->id)],
-            'valid_from' => 'required|date',
-            'valid_until' => 'required|date|after_or_equal:valid_from',
-            'status' => 'required|string|in:active,expired',
+            'pucc_number' => ['nullable', 'string', 'max:255', Rule::unique('vehicle_puccs')->ignore($pucc->id)],
+            'valid_from' => 'nullable|date',
+            'valid_until' => 'required|date', // This remains required
+            'status' => 'nullable|string|in:active,expired',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 

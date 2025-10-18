@@ -26,9 +26,9 @@ class VehicleFitnessController extends Controller
     public function storeForVehicle(Request $request, Vehicle $vehicle)
     {
         $data = $request->validate([
-            'certificate_number' => 'required|string|max:255|unique:vehicle_fitnesses,certificate_number',
-            'issue_date' => 'required|date',
-            'expiry_date' => 'required|date|after_or_equal:issue_date',
+            'certificate_number' => 'nullable|string|max:255|unique:vehicle_fitnesses,certificate_number',
+            'issue_date' => 'sometimes|nullable|date',
+            'expiry_date' => 'required|date',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -44,9 +44,9 @@ class VehicleFitnessController extends Controller
     public function update(Request $request, VehicleFitness $fitness)
     {
         $data = $request->validate([
-            'certificate_number' => ['required', 'string', 'max:255', Rule::unique('vehicle_fitnesses')->ignore($fitness->id)],
-            'issue_date' => 'required|date',
-            'expiry_date' => 'required|date|after_or_equal:issue_date',
+            'certificate_number' => ['nullable', 'string', 'max:255', Rule::unique('vehicle_fitnesses')->ignore($fitness->id)],
+            'issue_date' => 'sometimes|nullable|date',
+            'expiry_date' => 'required|date',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 

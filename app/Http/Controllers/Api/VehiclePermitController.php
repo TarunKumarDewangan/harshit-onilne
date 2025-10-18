@@ -26,9 +26,9 @@ class VehiclePermitController extends Controller
     public function storeForVehicle(Request $request, Vehicle $vehicle)
     {
         $data = $request->validate([
-            'permit_number' => 'required|string|max:255|unique:vehicle_permits,permit_number',
-            'issue_date' => 'required|date',
-            'expiry_date' => 'required|date|after_or_equal:issue_date',
+            'permit_number' => 'nullable|string|max:255|unique:vehicle_permits,permit_number',
+            'issue_date' => 'sometimes|nullable|date',
+            'expiry_date' => 'required|date', // This remains required
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -44,9 +44,9 @@ class VehiclePermitController extends Controller
     public function update(Request $request, VehiclePermit $permit)
     {
         $data = $request->validate([
-            'permit_number' => ['required', 'string', 'max:255', Rule::unique('vehicle_permits')->ignore($permit->id)],
-            'issue_date' => 'required|date',
-            'expiry_date' => 'required|date|after_or_equal:issue_date',
+            'permit_number' => ['nullable', 'string', 'max:255', Rule::unique('vehicle_permits')->ignore($permit->id)],
+            'issue_date' => 'sometimes|nullable|date',
+            'expiry_date' => 'required|date', // This remains required
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 

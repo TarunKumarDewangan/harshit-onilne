@@ -36,12 +36,12 @@ class VehicleInsuranceController extends Controller
     public function storeForVehicle(Request $request, Vehicle $vehicle)
     {
         $data = $request->validate([
-            'insurance_type' => 'required|string|max:255',
-            'company_name' => 'required|string|max:255',
-            'policy_number' => 'required|string|max:255|unique:vehicle_insurances,policy_number',
+            'insurance_type' => 'nullable|string|max:255',
+            'company_name' => 'nullable|string|max:255',
+            'policy_number' => 'nullable|string|max:255|unique:vehicle_insurances,policy_number',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|string|in:active,expired',
+            'status' => 'nullable|string|in:active,expired',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -62,12 +62,12 @@ class VehicleInsuranceController extends Controller
     public function update(Request $request, VehicleInsurance $insurance)
     {
         $data = $request->validate([
-            'insurance_type' => 'required|string|max:255',
-            'company_name' => 'required|string|max:255',
-            'policy_number' => ['required', 'string', 'max:255', Rule::unique('vehicle_insurances')->ignore($insurance->id)],
+            'insurance_type' => 'nullable|string|max:255',
+            'company_name' => 'nullable|string|max:255',
+            'policy_number' => ['nullable', 'string', 'max:255', Rule::unique('vehicle_insurances')->ignore($insurance->id)],
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|string|in:active,expired',
+            'status' => 'nullable|string|in:active,expired',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 

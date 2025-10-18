@@ -12,11 +12,11 @@ export default function VehiclePuccModal({ show, onHide, vehicle, onShowEdit }) 
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
 
-  const [form, setForm] = useState({
+ const [form, setForm] = useState({
     pucc_number: '',
     valid_from: '',
     valid_until: '',
-    status: 'active',
+    status: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -114,10 +114,22 @@ export default function VehiclePuccModal({ show, onHide, vehicle, onShowEdit }) 
         <h5 className="mb-3">Add New PUCC</h5>
         <Form onSubmit={submit}>
           <Row className="g-3">
-            <Col md={12}><Form.Group><Form.Label>PUCC Number *</Form.Label><Form.Control value={form.pucc_number} onChange={e => updateForm('pucc_number', e.target.value.toUpperCase())} required /></Form.Group></Col>
-            <Col md={4}><Form.Group><Form.Label>Valid From *</Form.Label><Form.Control type="date" value={form.valid_from} onChange={e => updateForm('valid_from', e.target.value)} required /></Form.Group></Col>
+             <Col md={12}><Form.Group><Form.Label>PUCC Number</Form.Label><Form.Control value={form.pucc_number} onChange={e => updateForm('pucc_number', e.target.value.toUpperCase())} /></Form.Group></Col>
+            <Col md={4}><Form.Group><Form.Label>Valid From</Form.Label><Form.Control type="date" value={form.valid_from} onChange={e => updateForm('valid_from', e.target.value)} /></Form.Group></Col>
+
+            {/* Keep the asterisk and 'required' prop for the mandatory field */}
             <Col md={4}><Form.Group><Form.Label>Valid Until *</Form.Label><Form.Control type="date" value={form.valid_until} onChange={e => updateForm('valid_until', e.target.value)} required /></Form.Group></Col>
-            <Col md={4}><Form.Group><Form.Label>Status *</Form.Label><Form.Select value={form.status} onChange={e => updateForm('status', e.target.value)}><option value="active">Active</option><option value="expired">Expired</option></Form.Select></Form.Group></Col>
+
+            <Col md={4}>
+                <Form.Group>
+                    <Form.Label>Status</Form.Label>
+                    <Form.Select value={form.status} onChange={e => updateForm('status', e.target.value)}>
+                        <option value="">-- Select Status --</option>
+                        <option value="active">Active</option>
+                        <option value="expired">Expired</option>
+                    </Form.Select>
+                </Form.Group>
+            </Col>
           </Row>
           <div className="text-end mt-3">
             <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Add PUCC'}</Button>
