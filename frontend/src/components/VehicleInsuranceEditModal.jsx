@@ -212,7 +212,7 @@ export default function VehicleInsuranceEditModal({ show, onHide, insuranceRecor
             </Col>
 
             {/* Keep asterisk and 'required' for mandatory fields */}
-            <Col md={6}><Form.Group><Form.Label>Start Date *</Form.Label><Form.Control type="date" value={form.start_date} onChange={e => updateForm('start_date', e.target.value)} required /></Form.Group></Col>
+           <Col md={6}><Form.Group><Form.Label>Start Date</Form.Label><Form.Control type="date" value={form.start_date} onChange={e => updateForm('start_date', e.target.value)} /></Form.Group></Col>
             <Col md={6}><Form.Group><Form.Label>End Date *</Form.Label><Form.Control type="date" value={form.end_date} onChange={e => updateForm('end_date', e.target.value)} required /></Form.Group></Col>
             {/* --- END OF THE FIX --- */}
           </Row>
