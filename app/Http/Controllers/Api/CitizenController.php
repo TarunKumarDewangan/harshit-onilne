@@ -152,43 +152,46 @@ class CitizenController extends Controller
         $today = Carbon::today();
         $expiredDocuments = [];
 
+        // --- FIX FOR LEARNER LICENSE ---
         $citizen->learnerLicenses()->whereDate('expiry_date', '<', $today)->get()->each(function ($ll) use (&$expiredDocuments) {
-            $expiredDocuments[] = ['type' => 'Learner License', 'identifier' => $ll->ll_no, 'expiry_date' => $ll->expiry_date->format('d-m-Y'), 'details' => "Office: {$ll->office}"];
+            $expiredDocuments[] = ['type' => 'Learner License', 'identifier' => $ll->ll_no, 'expiry_date' => $ll->expiry_date, 'details' => "Office: {$ll->office}"];
         });
 
+        // --- FIX FOR DRIVING LICENSE ---
         $citizen->drivingLicenses()->whereDate('expiry_date', '<', $today)->get()->each(function ($dl) use (&$expiredDocuments) {
-            $expiredDocuments[] = ['type' => 'Driving License', 'identifier' => $dl->dl_no, 'expiry_date' => $dl->expiry_date->format('d-m-Y'), 'details' => "Vehicle Class: {$dl->vehicle_class}"];
+            $expiredDocuments[] = ['type' => 'Driving License', 'identifier' => $dl->dl_no, 'expiry_date' => $dl->expiry_date, 'details' => "Vehicle Class: {$dl->vehicle_class}"];
         });
 
         $citizen->vehicles()->with(['insurances', 'puccs', 'fitnesses', 'taxes', 'permits', 'vltds', 'speedGovernors'])->get()->each(function ($vehicle) use (&$expiredDocuments, $today) {
             $regNo = $vehicle->registration_no;
 
+            // --- FIX FOR ALL VEHICLE SUB-DOCUMENTS ---
             $vehicle->insurances()->whereDate('end_date', '<', $today)->get()->each(function ($ins) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Insurance', 'identifier' => $regNo, 'expiry_date' => $ins->end_date->format('d-m-Y'), 'details' => "Policy: {$ins->policy_number}"];
+                $expiredDocuments[] = ['type' => 'Insurance', 'identifier' => $regNo, 'expiry_date' => $ins->end_date, 'details' => "Policy: {$ins->policy_number}"];
             });
 
             $vehicle->puccs()->whereDate('valid_until', '<', $today)->get()->each(function ($pucc) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'PUCC', 'identifier' => $regNo, 'expiry_date' => $pucc->valid_until->format('d-m-Y'), 'details' => "Certificate: {$pucc->pucc_number}"];
+                $expiredDocuments[] = ['type' => 'PUCC', 'identifier' => $regNo, 'expiry_date' => $pucc->valid_until, 'details' => "Certificate: {$pucc->pucc_number}"];
             });
 
             $vehicle->fitnesses()->whereDate('expiry_date', '<', $today)->get()->each(function ($fit) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Fitness', 'identifier' => $regNo, 'expiry_date' => $fit->expiry_date->format('d-m-Y'), 'details' => "Certificate: {$fit->certificate_number}"];
+                $expiredDocuments[] = ['type' => 'Fitness', 'identifier' => $regNo, 'expiry_date' => $fit->expiry_date, 'details' => "Certificate: {$fit->certificate_number}"];
             });
 
             $vehicle->taxes()->whereDate('tax_upto', '<', $today)->get()->each(function ($tax) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Tax', 'identifier' => $regNo, 'expiry_date' => $tax->tax_upto->format('d-m-Y'), 'details' => "Mode: {$tax->tax_mode}"];
+                $expiredDocuments[] = ['type' => 'Tax', 'identifier' => $regNo, 'expiry_date' => $tax->tax_upto, 'details' => "Mode: {$tax->tax_mode}"];
             });
 
             $vehicle->permits()->whereDate('expiry_date', '<', $today)->get()->each(function ($permit) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Permit', 'identifier' => $regNo, 'expiry_date' => $permit->expiry_date->format('d-m-Y'), 'details' => "Permit No: {$permit->permit_number}"];
+                $expiredDocuments[] = ['type' => 'Permit', 'identifier' => $regNo, 'expiry_date' => $permit->expiry_date, 'details' => "Permit No: {$permit->permit_number}"];
             });
 
             $vehicle->vltds()->whereDate('expiry_date', '<', $today)->get()->each(function ($vltd) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'VLTd', 'identifier' => $regNo, 'expiry_date' => $vltd->expiry_date->format('d-m-Y'), 'details' => "Certificate: {$vltd->certificate_number}"];
+                $expiredDocuments[] = ['type' => 'VLTd', 'identifier' => $regNo, 'expiry_date' => $vltd->expiry_date, 'details' => "Certificate: {$vltd->certificate_number}"];
             });
 
             $vehicle->speedGovernors()->whereDate('expiry_date', '<', $today)->get()->each(function ($sg) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Speed Governor', 'identifier' => $regNo, 'expiry_date' => $sg->expiry_date->format('d-m-Y'), 'details' => "Certificate: {$sg->certificate_number}"];
+                $expiredDocuments[] = ['type' => 'Speed Governor', 'identifier' => $regNo, 'expiry_date' => $sg->expiry_date, 'details' => "Certificate: {$sg->certificate_number}"];
             });
         });
 
@@ -197,4 +200,5 @@ class CitizenController extends Controller
             'expired_documents' => $expiredDocuments,
         ]);
     }
+
 }
