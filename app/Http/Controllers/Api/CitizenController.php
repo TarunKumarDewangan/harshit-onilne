@@ -80,7 +80,13 @@ class CitizenController extends Controller
         if ($authUser->role === 'user' && $citizen->user_id !== $authUser->id) {
             abort(403, 'This action is unauthorized.');
         }
-        $citizen->load(['learnerLicenses', 'drivingLicenses', 'vehicles']);
+
+        // --- START OF THE FIX ---
+        // Use loadCount to efficiently get the counts for the badges.
+        // This will fix the "Veh 0" bug.
+        $citizen->loadCount(['learnerLicenses', 'drivingLicenses', 'vehicles']);
+        // --- END OF THE FIX ---
+
         return $citizen;
     }
 
@@ -152,48 +158,103 @@ class CitizenController extends Controller
         $today = Carbon::today();
         $expiredDocuments = [];
 
-        // --- FIX FOR LEARNER LICENSE ---
+        // --- START OF MODIFIED LOGIC ---
+        // We now include 'full_record' in the response so the frontend can open edit modals.
+
         $citizen->learnerLicenses()->whereDate('expiry_date', '<', $today)->get()->each(function ($ll) use (&$expiredDocuments) {
-            $expiredDocuments[] = ['type' => 'Learner License', 'identifier' => $ll->ll_no, 'expiry_date' => $ll->expiry_date, 'details' => "Office: {$ll->office}"];
+            $expiredDocuments[] = [
+                'type' => 'Learner License',
+                'identifier' => $ll->ll_no,
+                'expiry_date' => $ll->expiry_date,
+                'details' => "Office: {$ll->office}",
+                'full_record' => $ll // Add full record
+            ];
         });
 
-        // --- FIX FOR DRIVING LICENSE ---
         $citizen->drivingLicenses()->whereDate('expiry_date', '<', $today)->get()->each(function ($dl) use (&$expiredDocuments) {
-            $expiredDocuments[] = ['type' => 'Driving License', 'identifier' => $dl->dl_no, 'expiry_date' => $dl->expiry_date, 'details' => "Vehicle Class: {$dl->vehicle_class}"];
+            $expiredDocuments[] = [
+                'type' => 'Driving License',
+                'identifier' => $dl->dl_no,
+                'expiry_date' => $dl->expiry_date,
+                'details' => "Vehicle Class: {$dl->vehicle_class}",
+                'full_record' => $dl // Add full record
+            ];
         });
 
         $citizen->vehicles()->with(['insurances', 'puccs', 'fitnesses', 'taxes', 'permits', 'vltds', 'speedGovernors'])->get()->each(function ($vehicle) use (&$expiredDocuments, $today) {
             $regNo = $vehicle->registration_no;
 
-            // --- FIX FOR ALL VEHICLE SUB-DOCUMENTS ---
             $vehicle->insurances()->whereDate('end_date', '<', $today)->get()->each(function ($ins) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Insurance', 'identifier' => $regNo, 'expiry_date' => $ins->end_date, 'details' => "Policy: {$ins->policy_number}"];
+                $expiredDocuments[] = [
+                    'type' => 'Insurance',
+                    'identifier' => $regNo,
+                    'expiry_date' => $ins->end_date,
+                    'details' => "Policy: {$ins->policy_number}",
+                    'full_record' => $ins // Add full record
+                ];
             });
 
             $vehicle->puccs()->whereDate('valid_until', '<', $today)->get()->each(function ($pucc) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'PUCC', 'identifier' => $regNo, 'expiry_date' => $pucc->valid_until, 'details' => "Certificate: {$pucc->pucc_number}"];
+                $expiredDocuments[] = [
+                    'type' => 'PUCC',
+                    'identifier' => $regNo,
+                    'expiry_date' => $pucc->valid_until,
+                    'details' => "Certificate: {$pucc->pucc_number}",
+                    'full_record' => $pucc // Add full record
+                ];
             });
 
             $vehicle->fitnesses()->whereDate('expiry_date', '<', $today)->get()->each(function ($fit) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Fitness', 'identifier' => $regNo, 'expiry_date' => $fit->expiry_date, 'details' => "Certificate: {$fit->certificate_number}"];
+                $expiredDocuments[] = [
+                    'type' => 'Fitness',
+                    'identifier' => $regNo,
+                    'expiry_date' => $fit->expiry_date,
+                    'details' => "Certificate: {$fit->certificate_number}",
+                    'full_record' => $fit // Add full record
+                ];
             });
 
             $vehicle->taxes()->whereDate('tax_upto', '<', $today)->get()->each(function ($tax) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Tax', 'identifier' => $regNo, 'expiry_date' => $tax->tax_upto, 'details' => "Mode: {$tax->tax_mode}"];
+                $expiredDocuments[] = [
+                    'type' => 'Tax',
+                    'identifier' => $regNo,
+                    'expiry_date' => $tax->tax_upto,
+                    'details' => "Mode: {$tax->tax_mode}",
+                    'full_record' => $tax // Add full record
+                ];
             });
 
             $vehicle->permits()->whereDate('expiry_date', '<', $today)->get()->each(function ($permit) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Permit', 'identifier' => $regNo, 'expiry_date' => $permit->expiry_date, 'details' => "Permit No: {$permit->permit_number}"];
+                $expiredDocuments[] = [
+                    'type' => 'Permit',
+                    'identifier' => $regNo,
+                    'expiry_date' => $permit->expiry_date,
+                    'details' => "Permit No: {$permit->permit_number}",
+                    'full_record' => $permit // Add full record
+                ];
             });
 
             $vehicle->vltds()->whereDate('expiry_date', '<', $today)->get()->each(function ($vltd) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'VLTd', 'identifier' => $regNo, 'expiry_date' => $vltd->expiry_date, 'details' => "Certificate: {$vltd->certificate_number}"];
+                $expiredDocuments[] = [
+                    'type' => 'VLTd',
+                    'identifier' => $regNo,
+                    'expiry_date' => $vltd->expiry_date,
+                    'details' => "Certificate: {$vltd->certificate_number}",
+                    'full_record' => $vltd // Add full record
+                ];
             });
 
             $vehicle->speedGovernors()->whereDate('expiry_date', '<', $today)->get()->each(function ($sg) use (&$expiredDocuments, $regNo) {
-                $expiredDocuments[] = ['type' => 'Speed Governor', 'identifier' => $regNo, 'expiry_date' => $sg->expiry_date, 'details' => "Certificate: {$sg->certificate_number}"];
+                $expiredDocuments[] = [
+                    'type' => 'Speed Governor',
+                    'identifier' => $regNo,
+                    'expiry_date' => $sg->expiry_date,
+                    'details' => "Certificate: {$sg->certificate_number}",
+                    'full_record' => $sg // Add full record
+                ];
             });
         });
+        // --- END OF MODIFIED LOGIC ---
 
         return response()->json([
             'citizen' => $citizen,

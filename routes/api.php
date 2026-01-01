@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\CitizenExportController;
 use App\Http\Controllers\Api\DatabaseBackupController;
 use App\Http\Controllers\Api\DocumentInquiryController;
+use App\Http\Controllers\Api\LlRegistryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,12 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // --- START: NEW ROUTE ---
+    // Only 'admin' role can access this endpoint to logout from all devices
+    Route::post('/logout-all', [AuthController::class, 'logoutAll'])
+        ->middleware(RoleMiddleware::class . ':admin');
+    // --- END: NEW ROUTE ---
+
     // Current user
     Route::get('/me', function (Request $request) {
         return $request->user()->load('primaryCitizen', 'branch');
@@ -69,6 +76,7 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
 
     Route::post('/reports/expiries/send-notification', [ExpiryReportController::class, 'sendManualNotification'])
         ->middleware(RoleMiddleware::class . ':admin,manager');
+
     // Export & Backups
     Route::get('/database-backups/download', [DatabaseBackupController::class, 'download']);
     Route::get('/export/tables', [DataExportController::class, 'index']);
@@ -142,6 +150,13 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
     Route::resource('speed-governors', VehicleSpeedGovernorController::class)->except(['index', 'create', 'edit', 'store']);
     Route::get('/vehicles/{vehicle}/speed-governors', [VehicleSpeedGovernorController::class, 'indexByVehicle']);
     Route::post('/vehicles/{vehicle}/speed-governors', [VehicleSpeedGovernorController::class, 'storeForVehicle']);
+
+    // LL Registry Routes
+    Route::get('/ll-registry', [LlRegistryController::class, 'index']);
+    Route::post('/ll-registry', [LlRegistryController::class, 'store']);
+    Route::put('/ll-registry/{id}', [LlRegistryController::class, 'update']);
+    Route::delete('/ll-registry/{id}', [LlRegistryController::class, 'destroy']);
+    Route::post('/ll-registry/{id}/send-message', [LlRegistryController::class, 'sendMessage']);
 
     // Admin
     Route::prefix('admin')->middleware(RoleMiddleware::class . ':admin,manager')->group(function () {

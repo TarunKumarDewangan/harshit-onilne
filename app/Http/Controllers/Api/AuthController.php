@@ -34,7 +34,7 @@ class AuthController extends Controller
                 'role' => 'user',
             ]);
 
-            // Create a linked Citizen profile (adapt fields to your schema)
+            // Create a linked Citizen profile
             $citizen = Citizen::create([
                 'user_id' => $user->id,
                 'name' => $user->name,
@@ -99,4 +99,17 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
     }
+
+    // --- START: NEW METHOD ---
+    /**
+     * Logout from ALL devices (Revoke all tokens).
+     */
+    public function logoutAll(Request $request)
+    {
+        // This deletes every token associated with this user ID from the database.
+        $request->user()->tokens()->delete();
+
+        return response()->json(['message' => 'Logged out from all devices successfully.']);
+    }
+    // --- END: NEW METHOD ---
 }

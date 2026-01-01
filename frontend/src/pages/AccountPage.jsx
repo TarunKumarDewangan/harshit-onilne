@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/apiClient';
 
 export default function AccountPage() {
-  const { user, loadMe } = useAuth();
+  const { user, loadMe, logout } = useAuth(); // Import logout
+  const navigate = useNavigate();
 
   const [phoneForm, setPhoneForm] = useState({ phone: user.phone || '', password: '' });
   const [passwordForm, setPasswordForm] = useState({ current_password: '', new_password: '', new_password_confirmation: '' });
 
   const [savingPhone, setSavingPhone] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [loggingOutAll, setLoggingOutAll] = useState(false); // New state for logout all
 
   const handlePhoneSubmit = async (e) => {
     e.preventDefault();
@@ -43,11 +45,30 @@ export default function AccountPage() {
     }
   };
 
+  // --- START: NEW HANDLER ---
+  const handleLogoutAll = async () => {
+    if (!window.confirm("ARE YOU SURE? This will log you out from this computer and ALL other devices instantly.")) {
+        return;
+    }
+
+    setLoggingOutAll(true);
+    try {
+        await api.post('/logout-all');
+        toast.success('Logged out from all devices.');
+        // Perform the frontend logout to clear local storage and redirect
+        logout();
+    } catch (err) {
+        toast.error('Failed to perform global logout.');
+        setLoggingOutAll(false);
+    }
+  };
+  // --- END: NEW HANDLER ---
+
   return (
     <Container className="py-4">
       <h3 className="mb-3">Account Settings</h3>
       <Row className="g-4">
-        {/* THE FIX IS HERE: The profile details form has been removed. */}
+        {/* Profile Details Link */}
         <Col lg={12}>
           <Card>
             <Card.Body>
@@ -95,6 +116,27 @@ export default function AccountPage() {
             </Card.Body>
           </Card>
         </Col>
+
+        {/* --- START: ADMIN ONLY SECTION --- */}
+        {user.role === 'admin' && (
+            <Col md={12}>
+                <Card border="danger" className="text-danger">
+                    <Card.Header className="bg-danger text-white fw-bold">Admin Security Zone</Card.Header>
+                    <Card.Body>
+                        <Card.Title>Session Management</Card.Title>
+                        <Card.Text>
+                            If you suspect your account is compromised or you left a session open on a public computer, use this button.
+                            It will invalidate <strong>all</strong> active login sessions for your account immediately.
+                        </Card.Text>
+                        <Button variant="danger" onClick={handleLogoutAll} disabled={loggingOutAll}>
+                            {loggingOutAll ? 'Processing...' : 'Logout From All Devices'}
+                        </Button>
+                    </Card.Body>
+                </Card>
+            </Col>
+        )}
+        {/* --- END: ADMIN ONLY SECTION --- */}
+
       </Row>
     </Container>
   );
