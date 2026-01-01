@@ -69,7 +69,10 @@ export default function Dashboard() {
                 value={adminStats.ll_eligible_for_dl}
                 color="primary"
                 icon="bi-card-heading"
-                link="/citizens" // Ideally link to a filtered view
+                // --- START OF THE FIX ---
+                // Changed link from /citizens to /ll-registry
+                link="/ll-registry"
+                // --- END OF THE FIX ---
                 desc="Learner Licenses crossed 30 days period."
             />
         </Col>
