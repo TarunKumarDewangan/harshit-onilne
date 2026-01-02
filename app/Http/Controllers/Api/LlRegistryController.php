@@ -19,6 +19,11 @@ class LlRegistryController extends Controller
         $search = $request->query('search');
         $showUnpaid = $request->query('show_unpaid');
 
+        // --- START OF NEW CODE ---
+        $expiryFrom = $request->query('expiry_from');
+        $expiryTo = $request->query('expiry_to');
+        // --- END OF NEW CODE ---
+
         $query = LlRegistry::query()->orderBy('id', 'desc');
 
         if ($search) {
@@ -26,13 +31,20 @@ class LlRegistryController extends Controller
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('mobile', 'like', "%$search%")
                     ->orWhere('application_no', 'like', "%$search%")
-                    ->orWhere('ll_no', 'like', "%$search%"); // Added search by LL No
+                    ->orWhere('ll_no', 'like', "%$search%");
             });
         }
 
         if ($showUnpaid === 'true') {
             $query->whereColumn('payment_asked', '>', 'payment_paid');
         }
+
+        // --- START OF NEW CODE (Date Range Filter) ---
+        if ($expiryFrom && $expiryTo) {
+            // Check records where 'end_date' (Expiry) falls within the range
+            $query->whereBetween('end_date', [$expiryFrom, $expiryTo]);
+        }
+        // --- END OF NEW CODE ---
 
         return $query->paginate(15);
     }

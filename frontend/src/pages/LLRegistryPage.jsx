@@ -11,15 +11,28 @@ export default function LLRegistryPage() {
     const [loading, setLoading] = useState(false);
 
     const [showUnpaidOnly, setShowUnpaidOnly] = useState(false);
-    const [sendingId, setSendingId] = useState(null);
+    // --- START OF NEW STATE ---
+    const [expiryFrom, setExpiryFrom] = useState('');
+    const [expiryTo, setExpiryTo] = useState('');
+    // --- END OF NEW STATE ---
 
+    const [sendingId, setSendingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [editingRecord, setEditingRecord] = useState(null);
 
     const fetchData = async (page = 1) => {
         setLoading(true);
         try {
-            const params = { page, search, show_unpaid: showUnpaidOnly };
+            // --- START OF MODIFIED PARAMS ---
+            const params = {
+                page,
+                search,
+                show_unpaid: showUnpaidOnly,
+                expiry_from: expiryFrom,
+                expiry_to: expiryTo
+            };
+            // --- END OF MODIFIED PARAMS ---
+
             const { data } = await api.get('/ll-registry', { params });
             setList(data.data);
             setMeta(data);
@@ -30,14 +43,15 @@ export default function LLRegistryPage() {
         }
     };
 
+    // Live Search & Filter Trigger
     useEffect(() => {
         const timeout = setTimeout(() => { fetchData(1); }, 500);
         return () => clearTimeout(timeout);
-    }, [search, showUnpaidOnly]);
+    }, [search, showUnpaidOnly, expiryFrom, expiryTo]); // Added date dependencies
 
+    // ... (handleAdd, handleEdit, handleDelete, handleSendMessage remain exactly the same) ...
     const handleAdd = () => { setEditingRecord(null); setShowModal(true); };
     const handleEdit = (rec) => { setEditingRecord(rec); setShowModal(true); };
-
     const handleDelete = async (id) => {
         if(window.confirm("Delete this entry permanently?")) {
             await api.delete(`/ll-registry/${id}`);
@@ -45,7 +59,6 @@ export default function LLRegistryPage() {
             fetchData(meta?.current_page || 1);
         }
     };
-
     const handleSendMessage = async (item) => {
         if(!window.confirm(`Send WhatsApp message to ${item.name}?`)) return;
         setSendingId(item.id);
@@ -59,6 +72,13 @@ export default function LLRegistryPage() {
         }
     };
 
+    const resetFilters = () => {
+        setSearch('');
+        setExpiryFrom('');
+        setExpiryTo('');
+        setShowUnpaidOnly(false);
+    };
+
     return (
         <Container className="py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -68,23 +88,45 @@ export default function LLRegistryPage() {
 
             <Card className="mb-3">
                 <Card.Body>
-                    <Row className="align-items-center">
-                        <Col md={8}>
+                    <Row className="g-2 align-items-end">
+                        <Col md={4}>
+                            <Form.Label className="small text-muted">Search Text</Form.Label>
                             <Form.Control
-                                placeholder="Search Name, Mobile, App No or LL No..."
+                                placeholder="Name, Mobile, App No..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </Col>
-                        <Col md={4} className="mt-2 mt-md-0">
-                            <Form.Check
+                        {/* --- START OF DATE FILTERS --- */}
+                        <Col md={2}>
+                            <Form.Label className="small text-muted">Expiry From</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={expiryFrom}
+                                onChange={(e) => setExpiryFrom(e.target.value)}
+                            />
+                        </Col>
+                        <Col md={2}>
+                            <Form.Label className="small text-muted">Expiry To</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={expiryTo}
+                                onChange={(e) => setExpiryTo(e.target.value)}
+                            />
+                        </Col>
+                        {/* --- END OF DATE FILTERS --- */}
+                        <Col md={2}>
+                             <Form.Check
                                 type="switch"
                                 id="unpaid-switch"
-                                label="Show Pending Dues Only"
+                                label="Pending Dues"
                                 checked={showUnpaidOnly}
                                 onChange={(e) => setShowUnpaidOnly(e.target.checked)}
-                                className="fw-bold text-danger"
+                                className="fw-bold text-danger mb-2"
                             />
+                        </Col>
+                        <Col md={2}>
+                            <Button variant="secondary" className="w-100" onClick={resetFilters}>Reset</Button>
                         </Col>
                     </Row>
                 </Card.Body>
