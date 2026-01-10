@@ -10,11 +10,14 @@ export default function LLRegistryPage() {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Filters
     const [showUnpaidOnly, setShowUnpaidOnly] = useState(false);
-    // --- START OF NEW STATE ---
     const [expiryFrom, setExpiryFrom] = useState('');
     const [expiryTo, setExpiryTo] = useState('');
-    // --- END OF NEW STATE ---
+
+    // --- NEW FILTERS ---
+    const [cross31Days, setCross31Days] = useState(false);
+    const [expiresInMonth, setExpiresInMonth] = useState(false);
 
     const [sendingId, setSendingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -23,15 +26,16 @@ export default function LLRegistryPage() {
     const fetchData = async (page = 1) => {
         setLoading(true);
         try {
-            // --- START OF MODIFIED PARAMS ---
             const params = {
                 page,
                 search,
                 show_unpaid: showUnpaidOnly,
                 expiry_from: expiryFrom,
-                expiry_to: expiryTo
+                expiry_to: expiryTo,
+                // Send new filters to backend
+                cross_31_days: cross31Days,
+                expires_in_month: expiresInMonth
             };
-            // --- END OF MODIFIED PARAMS ---
 
             const { data } = await api.get('/ll-registry', { params });
             setList(data.data);
@@ -44,14 +48,15 @@ export default function LLRegistryPage() {
     };
 
     // Live Search & Filter Trigger
+    // Added new filters to dependency array
     useEffect(() => {
         const timeout = setTimeout(() => { fetchData(1); }, 500);
         return () => clearTimeout(timeout);
-    }, [search, showUnpaidOnly, expiryFrom, expiryTo]); // Added date dependencies
+    }, [search, showUnpaidOnly, expiryFrom, expiryTo, cross31Days, expiresInMonth]);
 
-    // ... (handleAdd, handleEdit, handleDelete, handleSendMessage remain exactly the same) ...
     const handleAdd = () => { setEditingRecord(null); setShowModal(true); };
     const handleEdit = (rec) => { setEditingRecord(rec); setShowModal(true); };
+
     const handleDelete = async (id) => {
         if(window.confirm("Delete this entry permanently?")) {
             await api.delete(`/ll-registry/${id}`);
@@ -59,6 +64,7 @@ export default function LLRegistryPage() {
             fetchData(meta?.current_page || 1);
         }
     };
+
     const handleSendMessage = async (item) => {
         if(!window.confirm(`Send WhatsApp message to ${item.name}?`)) return;
         setSendingId(item.id);
@@ -77,7 +83,20 @@ export default function LLRegistryPage() {
         setExpiryFrom('');
         setExpiryTo('');
         setShowUnpaidOnly(false);
+        setCross31Days(false);
+        setExpiresInMonth(false);
     };
+
+    // Handler to ensure only one specific logic filter is active at a time to avoid conflicts
+    const toggleCross31 = (checked) => {
+        setCross31Days(checked);
+        if(checked) setExpiresInMonth(false); // Disable the other one
+    }
+
+    const toggleExpiresSoon = (checked) => {
+        setExpiresInMonth(checked);
+        if(checked) setCross31Days(false); // Disable the other one
+    }
 
     return (
         <Container className="py-4">
@@ -86,35 +105,51 @@ export default function LLRegistryPage() {
                 <Button onClick={handleAdd}>+ New Entry</Button>
             </div>
 
-            <Card className="mb-3">
+            <Card className="mb-3 border-0 shadow-sm">
                 <Card.Body>
-                    <Row className="g-2 align-items-end">
-                        <Col md={4}>
-                            <Form.Label className="small text-muted">Search Text</Form.Label>
+                    <Row className="g-3 align-items-end">
+                        {/* Search */}
+                        <Col md={3}>
+                            <Form.Label className="small text-muted fw-bold">Search</Form.Label>
                             <Form.Control
                                 placeholder="Name, Mobile, App No..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </Col>
-                        {/* --- START OF DATE FILTERS --- */}
+
+                        {/* Date Range */}
                         <Col md={2}>
-                            <Form.Label className="small text-muted">Expiry From</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={expiryFrom}
-                                onChange={(e) => setExpiryFrom(e.target.value)}
-                            />
+                            <Form.Label className="small text-muted fw-bold">Expiry From</Form.Label>
+                            <Form.Control type="date" value={expiryFrom} onChange={(e) => setExpiryFrom(e.target.value)} />
                         </Col>
                         <Col md={2}>
-                            <Form.Label className="small text-muted">Expiry To</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={expiryTo}
-                                onChange={(e) => setExpiryTo(e.target.value)}
-                            />
+                            <Form.Label className="small text-muted fw-bold">Expiry To</Form.Label>
+                            <Form.Control type="date" value={expiryTo} onChange={(e) => setExpiryTo(e.target.value)} />
                         </Col>
-                        {/* --- END OF DATE FILTERS --- */}
+
+                        {/* Toggles */}
+                        <Col md={3}>
+                            <div className="d-flex flex-column gap-2">
+                                <Form.Check
+                                    type="switch"
+                                    id="cross-31"
+                                    label="Crossed 31 Days (DL Ready)"
+                                    checked={cross31Days}
+                                    onChange={(e) => toggleCross31(e.target.checked)}
+                                    className="fw-bold text-primary"
+                                />
+                                <Form.Check
+                                    type="switch"
+                                    id="expire-month"
+                                    label="Expires in 1 Month"
+                                    checked={expiresInMonth}
+                                    onChange={(e) => toggleExpiresSoon(e.target.checked)}
+                                    className="fw-bold text-warning"
+                                />
+                            </div>
+                        </Col>
+
                         <Col md={2}>
                              <Form.Check
                                 type="switch"
@@ -124,9 +159,7 @@ export default function LLRegistryPage() {
                                 onChange={(e) => setShowUnpaidOnly(e.target.checked)}
                                 className="fw-bold text-danger mb-2"
                             />
-                        </Col>
-                        <Col md={2}>
-                            <Button variant="secondary" className="w-100" onClick={resetFilters}>Reset</Button>
+                            <Button variant="outline-secondary" size="sm" className="w-100" onClick={resetFilters}>Reset All</Button>
                         </Col>
                     </Row>
                 </Card.Body>
@@ -149,20 +182,21 @@ export default function LLRegistryPage() {
                     </thead>
                     <tbody>
                         {loading ? <tr><td colSpan={9} className="text-center"><Spinner size="sm"/></td></tr> :
-                         list.length === 0 ? <tr><td colSpan={9} className="text-center">No records found.</td></tr> :
+                         list.length === 0 ? <tr><td colSpan={9} className="text-center py-4">No records found.</td></tr> :
                          list.map((item, idx) => (
                             <tr key={item.id}>
                                 <td>{(meta?.from || 1) + idx}</td>
                                 <td className="fw-bold">{item.name}</td>
                                 <td>{item.mobile}</td>
                                 <td>
-                                    <div><span className="text-muted">App:</span> {item.application_no || '-'}</div>
-                                    <div><span className="text-muted">LL:</span> <span className="text-primary">{item.ll_no || '-'}</span></div>
+                                    <div><span className="text-muted small">App:</span> {item.application_no || '-'}</div>
+                                    <div><span className="text-muted small">LL:</span> <span className="text-primary">{item.ll_no || '-'}</span></div>
                                 </td>
                                 <td>{item.dob || '-'}</td>
                                 <td>
-                                    <div className="small text-muted">
-                                        {item.start_date || '?'} <br/> to {item.end_date || '?'}
+                                    <div className="small">
+                                        <span className="text-success">{item.start_date || '?'}</span> <br/>
+                                        <span className="text-danger">to {item.end_date || '?'}</span>
                                     </div>
                                 </td>
                                 <td>
@@ -175,18 +209,19 @@ export default function LLRegistryPage() {
                                     </Badge>
                                 </td>
                                 <td>
-                                    <div className="d-flex align-items-center gap-2">
+                                    <div className="d-flex align-items-center gap-1">
                                         <Button
                                             variant="outline-success"
                                             size="sm"
                                             className="py-0 px-2"
                                             onClick={() => handleSendMessage(item)}
                                             disabled={sendingId === item.id}
+                                            title="Send WhatsApp"
                                         >
-                                            {sendingId === item.id ? '...' : <i className="bi bi-whatsapp"></i>} Send
+                                            {sendingId === item.id ? '...' : <i className="bi bi-whatsapp"></i>}
                                         </Button>
-                                        <Button variant="link" size="sm" className="p-0" onClick={() => handleEdit(item)}>Edit</Button>
-                                        <Button variant="link" size="sm" className="p-0 text-danger" onClick={() => handleDelete(item.id)}>Del</Button>
+                                        <Button variant="outline-primary" size="sm" className="py-0 px-2" onClick={() => handleEdit(item)}>Edit</Button>
+                                        <Button variant="outline-danger" size="sm" className="py-0 px-2" onClick={() => handleDelete(item.id)}>Del</Button>
                                     </div>
                                 </td>
                             </tr>
@@ -196,7 +231,7 @@ export default function LLRegistryPage() {
             </div>
 
             {meta && meta.last_page > 1 && (
-                <div className="d-flex justify-content-end">
+                <div className="d-flex justify-content-end mt-3">
                     <Pagination>
                         <Pagination.Prev onClick={() => fetchData(meta.current_page - 1)} disabled={meta.current_page === 1} />
                         <Pagination.Item active>{meta.current_page}</Pagination.Item>

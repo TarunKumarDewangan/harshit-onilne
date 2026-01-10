@@ -10,17 +10,21 @@ class LlRegistry extends Model
 {
     use HasFactory;
 
+
     protected $fillable = [
         'name',
         'mobile',
+        'given_by', // --- ADDED ---
         'application_no',
+        'll_no',
         'dob',
-        'll_no', // Added to fillable
         'start_date',
         'end_date',
         'payment_asked',
-        'payment_paid'
+        'payment_paid',
+        'aadhar_path' // --- ADDED ---
     ];
+
 
     protected $casts = [
         'dob' => 'date',
