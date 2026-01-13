@@ -210,16 +210,17 @@ export default function LLRegistryPage() {
                                 </td>
                                 <td>
                                     <div className="d-flex align-items-center gap-1">
-                                        <Button
-                                            variant="outline-success"
-                                            size="sm"
-                                            className="py-0 px-2"
-                                            onClick={() => handleSendMessage(item)}
-                                            disabled={sendingId === item.id}
-                                            title="Send WhatsApp"
-                                        >
-                                            {sendingId === item.id ? '...' : <i className="bi bi-whatsapp"></i>}
-                                        </Button>
+                                       <Button
+    variant="outline-success"
+    size="sm"
+    className="py-0 px-2"
+    onClick={() => handleSendMessage(item)}
+    disabled={sendingId === item.id}
+    title="Send WhatsApp"
+>
+    {/* ADDED "Send" TEXT HERE */}
+    {sendingId === item.id ? '...' : <><i className="bi bi-whatsapp"></i> Send</>}
+</Button>
                                         <Button variant="outline-primary" size="sm" className="py-0 px-2" onClick={() => handleEdit(item)}>Edit</Button>
                                         <Button variant="outline-danger" size="sm" className="py-0 px-2" onClick={() => handleDelete(item.id)}>Del</Button>
                                     </div>

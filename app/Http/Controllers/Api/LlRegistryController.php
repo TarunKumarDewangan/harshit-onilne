@@ -159,7 +159,8 @@ class LlRegistryController extends Controller
         $message = "प्रिय ग्राहक " . $record->name . ",\n\n";
         $message .= "आपके लर्निंग लाइसेंस की 31 दिन की अवधि पूर्ण हो चुकी है।\n";
         $message .= "ड्राइविंग लाइसेंस बनवाने हेतु कृपया संपर्क करें। \n\n\n";
-        $message .= "HARSHIT RTO & INSURANCE SERVICES \n 7000175067 | 7999664014\n\n\n\n";
+        //$message .= "HARSHIT RTO & INSURANCE SERVICES \n 7000175067 | 7999664014\n\n\n\n";
+        $message .= "HARSHIT RTO & INSURANCE SERVICES \n 8516941730 | 7000175067\n\n\n\n";
         $message .= "ड्राइविंग लाइसेंस बनाने का समय:बुधवार एवं गुरुवार \nसमय: सुबह 11 बजे से दोपहर 2 बजे तक";
 
         $success = $whatsAppService->sendTextMessage('91' . $record->mobile, $message);
