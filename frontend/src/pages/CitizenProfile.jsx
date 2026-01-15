@@ -25,11 +25,24 @@ import { toast } from 'react-toastify';
 import SendMessageModal from '../components/SendMessageModal';
 import VehicleTaxEditModal from '../components/VehicleTaxEditModal';
 
-// Helper component for the compact validity buttons
+// Helper component with EVEN LARGER SIZES
 const ValidityButton = ({ label, date, onClick, variant = 'outline-secondary' }) => (
-    <div className="d-flex flex-column align-items-center" style={{ minWidth: '60px' }}>
-        <Button size="sm" variant={variant} onClick={onClick} className="w-100 py-0" style={{ fontSize: '0.8rem' }}>{label}</Button>
-        <small className="text-muted mt-1" style={{ fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{date || '-'}</small>
+    <div className="d-flex flex-column align-items-center" style={{ minWidth: '100px' }}>
+        <Button
+            size="sm"
+            variant={variant}
+            onClick={onClick}
+            className="w-100 fw-bold"
+            style={{ fontSize: '1rem', padding: '6px 10px' }}
+        >
+            {label}
+        </Button>
+        <small
+            className="text-dark fw-bold mt-1"
+            style={{ fontSize: '0.95rem', whiteSpace: 'nowrap' }}
+        >
+            {date || '-'}
+        </small>
     </div>
 );
 
@@ -236,7 +249,7 @@ export default function CitizenProfile() {
                 <tr>
                   <th>#</th>
                   <th>Registration</th>
-                  <th style={{ minWidth: '600px' }}>Validities & Actions</th>
+                  <th style={{ minWidth: '750px' }}>Validities & Actions</th> {/* Increased width container */}
                   <th>Type</th>
                   <th>Make/Model</th>
                   <th>Chassis</th>
@@ -252,9 +265,9 @@ export default function CitizenProfile() {
                         <div className="fw-bold">{r.registration_no}</div>
                       </td>
                       <td>
-                        <div className="d-flex align-items-center" style={{ gap: '0.5rem' }}>
+                        <div className="d-flex align-items-center" style={{ gap: '0.75rem' }}>
                             {/* Validity Buttons with Dates */}
-                            <div className="d-flex" style={{ gap: '0.5rem', minWidth: '450px' }}>
+                            <div className="d-flex" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
                                 <ValidityButton label="Tax" date={r.latest_tax_expiry} onClick={() => { setTaxVehicle(r); setShowTax(true); }} />
                                 <ValidityButton label="Ins" date={r.latest_insurance_expiry} onClick={() => handleShowInsurance(r)} variant="outline-info" />
                                 <ValidityButton label="PUCC" date={r.latest_pucc_expiry} onClick={() => handleShowPucc(r)} variant="outline-success" />
@@ -264,7 +277,7 @@ export default function CitizenProfile() {
                                 <ValidityButton label="Speed" date={r.latest_speed_governor_expiry} onClick={() => handleShowSpeedGovernor(r)} />
                             </div>
 
-                            <div className="vr mx-2"></div>
+                            <div className="vr mx-2" style={{height: '50px'}}></div>
 
                             {/* Action Buttons */}
                             <ButtonGroup vertical>
@@ -337,7 +350,7 @@ export default function CitizenProfile() {
         </Tab>
       </Tabs>
 
-      {/* Modals */}
+      {/* All modals at the bottom of the file remain exactly the same */}
       <SendMessageModal show={showSendMessage} onHide={() => setShowSendMessage(false)} citizen={messagingCitizen} />
       <CitizenEditModal show={showEdit} onHide={() => setShowEdit(false)} citizen={citizen} onUpdated={() => { loadPageData(); refreshAllDetails(); }} />
       <VehicleEditModal show={showVehEdit} onHide={() => setShowVehEdit(false)} vehicleRecord={editingVeh} onUpdated={() => { setShowVehEdit(false); loadPageData(); refreshAllDetails(); }} />

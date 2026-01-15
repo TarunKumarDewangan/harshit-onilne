@@ -14,8 +14,6 @@ export default function LLRegistryPage() {
     const [showUnpaidOnly, setShowUnpaidOnly] = useState(false);
     const [expiryFrom, setExpiryFrom] = useState('');
     const [expiryTo, setExpiryTo] = useState('');
-
-    // --- NEW FILTERS ---
     const [cross31Days, setCross31Days] = useState(false);
     const [expiresInMonth, setExpiresInMonth] = useState(false);
 
@@ -32,7 +30,6 @@ export default function LLRegistryPage() {
                 show_unpaid: showUnpaidOnly,
                 expiry_from: expiryFrom,
                 expiry_to: expiryTo,
-                // Send new filters to backend
                 cross_31_days: cross31Days,
                 expires_in_month: expiresInMonth
             };
@@ -48,7 +45,6 @@ export default function LLRegistryPage() {
     };
 
     // Live Search & Filter Trigger
-    // Added new filters to dependency array
     useEffect(() => {
         const timeout = setTimeout(() => { fetchData(1); }, 500);
         return () => clearTimeout(timeout);
@@ -87,19 +83,18 @@ export default function LLRegistryPage() {
         setExpiresInMonth(false);
     };
 
-    // Handler to ensure only one specific logic filter is active at a time to avoid conflicts
     const toggleCross31 = (checked) => {
         setCross31Days(checked);
-        if(checked) setExpiresInMonth(false); // Disable the other one
+        if(checked) setExpiresInMonth(false);
     }
 
     const toggleExpiresSoon = (checked) => {
         setExpiresInMonth(checked);
-        if(checked) setCross31Days(false); // Disable the other one
+        if(checked) setCross31Days(false);
     }
 
     return (
-        <Container className="py-4">
+        <Container fluid className="py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h3 className="mb-0">Learning License Registry</h3>
                 <Button onClick={handleAdd}>+ New Entry</Button>
@@ -108,17 +103,14 @@ export default function LLRegistryPage() {
             <Card className="mb-3 border-0 shadow-sm">
                 <Card.Body>
                     <Row className="g-3 align-items-end">
-                        {/* Search */}
                         <Col md={3}>
-                            <Form.Label className="small text-muted fw-bold">Search</Form.Label>
+                            <Form.Label className="small text-muted fw-bold">Search Text</Form.Label>
                             <Form.Control
-                                placeholder="Name, Mobile, App No..."
+                                placeholder="Name, Mobile, App No, Given By..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </Col>
-
-                        {/* Date Range */}
                         <Col md={2}>
                             <Form.Label className="small text-muted fw-bold">Expiry From</Form.Label>
                             <Form.Control type="date" value={expiryFrom} onChange={(e) => setExpiryFrom(e.target.value)} />
@@ -127,8 +119,6 @@ export default function LLRegistryPage() {
                             <Form.Label className="small text-muted fw-bold">Expiry To</Form.Label>
                             <Form.Control type="date" value={expiryTo} onChange={(e) => setExpiryTo(e.target.value)} />
                         </Col>
-
-                        {/* Toggles */}
                         <Col md={3}>
                             <div className="d-flex flex-column gap-2">
                                 <Form.Check
@@ -149,7 +139,6 @@ export default function LLRegistryPage() {
                                 />
                             </div>
                         </Col>
-
                         <Col md={2}>
                              <Form.Check
                                 type="switch"
@@ -165,12 +154,13 @@ export default function LLRegistryPage() {
                 </Card.Body>
             </Card>
 
-            <div className="table-responsive">
+          <div className="table-responsive">
                 <Table striped bordered hover size="sm" className="align-middle">
                     <thead className="bg-light">
                         <tr>
                             <th>#</th>
                             <th>Name</th>
+                            <th>Given By</th> {/* --- NEW SEPARATE COLUMN HEADER --- */}
                             <th>Mobile</th>
                             <th>App / LL No</th>
                             <th>DOB</th>
@@ -181,12 +171,17 @@ export default function LLRegistryPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? <tr><td colSpan={9} className="text-center"><Spinner size="sm"/></td></tr> :
-                         list.length === 0 ? <tr><td colSpan={9} className="text-center py-4">No records found.</td></tr> :
+                        {loading ? <tr><td colSpan={10} className="text-center"><Spinner size="sm"/></td></tr> :
+                         list.length === 0 ? <tr><td colSpan={10} className="text-center py-4">No records found.</td></tr> :
                          list.map((item, idx) => (
                             <tr key={item.id}>
                                 <td>{(meta?.from || 1) + idx}</td>
                                 <td className="fw-bold">{item.name}</td>
+
+                                {/* --- NEW SEPARATE COLUMN DATA --- */}
+                                <td>{item.given_by || '-'}</td>
+                                {/* ------------------------------- */}
+
                                 <td>{item.mobile}</td>
                                 <td>
                                     <div><span className="text-muted small">App:</span> {item.application_no || '-'}</div>
@@ -210,17 +205,16 @@ export default function LLRegistryPage() {
                                 </td>
                                 <td>
                                     <div className="d-flex align-items-center gap-1">
-                                       <Button
-    variant="outline-success"
-    size="sm"
-    className="py-0 px-2"
-    onClick={() => handleSendMessage(item)}
-    disabled={sendingId === item.id}
-    title="Send WhatsApp"
->
-    {/* ADDED "Send" TEXT HERE */}
-    {sendingId === item.id ? '...' : <><i className="bi bi-whatsapp"></i> Send</>}
-</Button>
+                                        <Button
+                                            variant="outline-success"
+                                            size="sm"
+                                            className="py-0 px-2"
+                                            onClick={() => handleSendMessage(item)}
+                                            disabled={sendingId === item.id}
+                                            title="Send WhatsApp"
+                                        >
+                                            {sendingId === item.id ? '...' : <><i className="bi bi-whatsapp"></i> Send</>}
+                                        </Button>
                                         <Button variant="outline-primary" size="sm" className="py-0 px-2" onClick={() => handleEdit(item)}>Edit</Button>
                                         <Button variant="outline-danger" size="sm" className="py-0 px-2" onClick={() => handleDelete(item.id)}>Del</Button>
                                     </div>
