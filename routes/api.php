@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\CitizenExportController;
 use App\Http\Controllers\Api\DatabaseBackupController;
 use App\Http\Controllers\Api\DocumentInquiryController;
 use App\Http\Controllers\Api\LlRegistryController;
+use App\Http\Controllers\Api\CreditController;
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +110,7 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
     Route::resource('ll', LearnerLicenseController::class)->except(['index', 'create', 'edit', 'store']);
     Route::resource('dl', DrivingLicenseController::class)->except(['index', 'create', 'edit', 'store']);
     Route::resource('vehicles', VehicleController::class)->except(['index', 'create', 'edit', 'store']);
+    Route::resource('credits', CreditController::class)->except(['create', 'edit']);
 
     // Nested by Citizen
     Route::get('/citizens/{citizen}/ll', [LearnerLicenseController::class, 'indexByCitizen']);

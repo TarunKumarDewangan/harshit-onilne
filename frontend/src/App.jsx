@@ -31,6 +31,7 @@ import DocumentInquiryPage from './pages/DocumentInquiryPage';
 import AdminInquiriesPage from './pages/AdminInquiriesPage';
 import './Responsive.css';
 import LLRegistryPage from './pages/LLRegistryPage';
+import CreditPage from './pages/CreditPage';
 
 
 function Shell({ children }) {
@@ -52,6 +53,7 @@ function Shell({ children }) {
                   <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
                   <Nav.Link as={Link} to="/citizens">Citizens</Nav.Link>
                   <Nav.Link as={Link} to="/ll-registry" className="fw-bold text-primary">LL Registry</Nav.Link>
+                  <Nav.Link as={Link} to="/credit" className="fw-bold text-success">That Credit</Nav.Link>
 
                   {/* --- START OF THE FIX --- */}
                   {/* Added explicit menu item for Expiry Report for Admins/Managers */}
@@ -147,6 +149,7 @@ export default function App() {
         <Route path="/admin/export" element={<PrivateRoute roles={['admin']}><DataExportPage /></PrivateRoute>} />
         <Route path="/admin/inquiries" element={<PrivateRoute roles={['admin', 'manager']}><AdminInquiriesPage /></PrivateRoute>} />
         <Route path="/ll-registry" element={<PrivateRoute><LLRegistryPage /></PrivateRoute>} />
+        <Route path="/credit" element={<PrivateRoute><CreditPage /></PrivateRoute>} />
 
 
         <Route path="/account" element={<PrivateRoute><AccountPage /></PrivateRoute>} />
