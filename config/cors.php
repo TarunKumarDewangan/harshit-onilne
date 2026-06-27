@@ -8,6 +8,8 @@ return [
     'allowed_origins' => [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
+        'http://localhost:5177',
+        'http://127.0.0.1:5177',
         // keep this only if you will call from the live site during testing:
         'https://harshitonline.in',
     ],

@@ -79,6 +79,9 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
 
     // Export & Backups
     Route::get('/database-backups/download', [DatabaseBackupController::class, 'download']);
+    Route::post('/database-backups/import', [DatabaseBackupController::class, 'import']);
+    Route::get('/database-backups/download-json', [DatabaseBackupController::class, 'downloadJson']);
+    Route::post('/database-backups/import-json', [DatabaseBackupController::class, 'importJson']);
     Route::get('/export/tables', [DataExportController::class, 'index']);
     Route::get('/export/table/{tableName}', [DataExportController::class, 'exportTable']);
     Route::get('/export/all-as-zip', [DataExportController::class, 'exportAllAsZip']);
