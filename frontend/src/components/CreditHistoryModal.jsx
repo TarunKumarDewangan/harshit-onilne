@@ -15,7 +15,7 @@ const formatDate = (dateString) => {
   }
 };
 
-export default function CreditHistoryModal({ show, onHide, credit, onAddEntry }) {
+export default function CreditHistoryModal({ show, onHide, credit, onAddEntry, onEdit, onDelete }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -125,7 +125,8 @@ export default function CreditHistoryModal({ show, onHide, credit, onAddEntry })
                         <th className="text-end">Given</th>
                         <th className="text-end">Balance</th>
                         <th>Added By</th>
-                        <th className="pe-3">Date Added</th>
+                        <th>Date Added</th>
+                        <th className="text-center pe-3" style={{ width: '140px' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -143,7 +144,25 @@ export default function CreditHistoryModal({ show, onHide, credit, onAddEntry })
                             <td>
                               <small className="text-muted">{h.user?.name || 'Unknown'}</small>
                             </td>
-                            <td className="pe-3">{formatDate(h.created_at)}</td>
+                            <td>{formatDate(h.created_at)}</td>
+                            <td className="text-center pe-3">
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                className="me-1 py-0 px-2"
+                                onClick={() => onEdit(h)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline-danger"
+                                size="sm"
+                                className="py-0 px-2"
+                                onClick={() => onDelete(h)}
+                              >
+                                Delete
+                              </Button>
+                            </td>
                           </tr>
                         );
                       })}

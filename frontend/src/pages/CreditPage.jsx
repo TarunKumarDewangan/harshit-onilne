@@ -108,6 +108,11 @@ export default function CreditPage() {
     setShowModal(true);
   };
 
+  const handleEditFromHistory = (record) => {
+    setShowHistoryModal(false);
+    handleEdit(record);
+  };
+
   const handleDelete = async (record) => {
     if (window.confirm(`Are you sure you want to delete the credit record for '${record.name}'?`)) {
       try {
@@ -118,6 +123,11 @@ export default function CreditPage() {
         toast.error(err.response?.data?.message || 'Failed to delete record');
       }
     }
+  };
+
+  const handleDeleteFromHistory = async (record) => {
+    setShowHistoryModal(false);
+    await handleDelete(record);
   };
 
   const handleSendWhatsApp = async (record) => {
@@ -300,7 +310,7 @@ export default function CreditPage() {
                   >
                     Date Added{renderSortIndicator('created_at')}
                   </th>
-                  <th className="text-center pe-3" style={{ width: '200px' }}>Actions</th>
+                  <th className="text-center pe-3" style={{ width: '180px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -370,17 +380,10 @@ export default function CreditPage() {
                         <Button
                           variant="outline-primary"
                           size="sm"
-                          className="me-2"
-                          onClick={() => handleEdit(item)}
+                          onClick={() => { setHistoryRecord(item); setShowHistoryModal(true); }}
+                          title="View History / Details"
                         >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleDelete(item)}
-                        >
-                          Delete
+                          <i className="bi bi-eye me-1"></i> Details
                         </Button>
                       </td>
                     </tr>
@@ -438,6 +441,8 @@ export default function CreditPage() {
         onHide={() => { setShowHistoryModal(false); setHistoryRecord(null); }}
         credit={historyRecord}
         onAddEntry={handleAddForPerson}
+        onEdit={handleEditFromHistory}
+        onDelete={handleDeleteFromHistory}
       />
     </Container>
   );

@@ -66,12 +66,29 @@ class CreditController extends Controller
             $query->where('balance_amount', '>', 0);
         }
 
-        // Calculate totals on the filtered query (before pagination)
+        // Calculate totals on the filtered query BEFORE grouping
         $totals = [
             'total_amount' => (float) $query->sum('total_amount'),
             'given_amount' => (float) $query->sum('given_amount'),
             'balance_amount' => (float) $query->sum('balance_amount'),
         ];
+
+        // Now apply grouping to avoid repeating same person multiple times
+        $query->select([
+            \DB::raw("MIN(id) as id"),
+            \DB::raw("MAX(name) as name"),
+            'mobile',
+            \DB::raw("GROUP_CONCAT(DISTINCT NULLIF(work_done, '') ORDER BY id DESC SEPARATOR ', ') as work_done"),
+            \DB::raw("SUM(total_amount) as total_amount"),
+            \DB::raw("SUM(given_amount) as given_amount"),
+            \DB::raw("SUM(balance_amount) as balance_amount"),
+            \DB::raw("MAX(created_at) as created_at"),
+            \DB::raw("MIN(user_id) as user_id"),
+        ])
+        ->groupBy([
+            'mobile',
+            \DB::raw("COALESCE(NULLIF(mobile, ''), CONCAT('empty_', id))")
+        ]);
 
         $paginated = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
 
