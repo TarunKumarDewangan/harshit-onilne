@@ -12,6 +12,7 @@ class Kernel extends ConsoleKernel
     //->everyMinute()
     protected $commands = [
         Commands\SendExpiryNotifications::class,
+        Commands\SendCreditReminders::class,
     ];
     protected function schedule(Schedule $schedule): void
     {
@@ -24,6 +25,17 @@ class Kernel extends ConsoleKernel
             })
             ->after(function () {
                 \Log::info('Scheduler finished notifications at: ' . now());
+            });
+
+        $schedule->command('notifications:send-credits')
+            ->dailyAt('10:00')
+            ->timezone('Asia/Kolkata')
+            ->appendOutputTo(storage_path('logs/scheduler.log'))
+            ->before(function () {
+                \Log::info('Scheduler starting credit reminders at: ' . now());
+            })
+            ->after(function () {
+                \Log::info('Scheduler finished credit reminders at: ' . now());
             });
     }
 

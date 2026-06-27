@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Container, Card, Row, Col, Form, Button, Table, Alert, Spinner, Pagination, Badge } from 'react-bootstrap';
+import { Container, Card, Row, Col, Form, Button, Table, Alert, Spinner, Pagination } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import api from '../services/apiClient';
 import CreditModal from '../components/CreditModal';
+import CreditHistoryModal from '../components/CreditHistoryModal';
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -34,6 +35,13 @@ export default function CreditPage() {
   // Modals state
   const [showModal, setShowModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  // History modal state
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historyRecord, setHistoryRecord] = useState(null);
+
+  // WhatsApp loading state
+  const [sendingMessageId, setSendingMessageId] = useState(null);
 
   const fetchCredits = useCallback(async (
     page = 1, 
@@ -109,6 +117,26 @@ export default function CreditPage() {
       } catch (err) {
         toast.error(err.response?.data?.message || 'Failed to delete record');
       }
+    }
+  };
+
+  const handleSendWhatsApp = async (record) => {
+    if (!record.mobile) {
+      toast.warn('No mobile number set for this record.');
+      return;
+    }
+    if (!window.confirm(`Send manual WhatsApp reminder to ${record.name} at ${record.mobile}?`)) {
+      return;
+    }
+    setSendingMessageId(record.id);
+    try {
+      await api.post(`/credits/${record.id}/send-message`);
+      toast.success('WhatsApp reminder sent successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to send WhatsApp reminder.');
+    } finally {
+      setSendingMessageId(null);
     }
   };
 
@@ -266,7 +294,7 @@ export default function CreditPage() {
                   >
                     Date Added{renderSortIndicator('created_at')}
                   </th>
-                  <th className="text-center pe-3" style={{ width: '160px' }}>Actions</th>
+                  <th className="text-center pe-3" style={{ width: '200px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -292,7 +320,14 @@ export default function CreditPage() {
                     <tr key={item.id}>
                       <td className="ps-3 text-muted">{rowNum}</td>
                       <td>
-                        <strong className="text-primary">{item.name}</strong>
+                        <span 
+                          className="text-primary fw-bold" 
+                          style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => { setHistoryRecord(item); setShowHistoryModal(true); }}
+                          title="Click to view history"
+                        >
+                          {item.name}
+                        </span>
                       </td>
                       <td>{item.mobile || '-'}</td>
                       <td className="text-truncate" style={{ maxWidth: '220px' }} title={item.work_done}>
@@ -310,6 +345,22 @@ export default function CreditPage() {
                         <span className="small text-secondary">{formatDate(item.created_at)}</span>
                       </td>
                       <td className="text-center pe-3">
+                        {/* WhatsApp Button */}
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          className="me-2 py-1 px-2 btn-outline-success text-success"
+                          disabled={!item.mobile || balance <= 0 || sendingMessageId === item.id}
+                          onClick={() => handleSendWhatsApp(item)}
+                          title="Send WhatsApp Reminder"
+                          style={{ borderColor: '#25d366' }}
+                        >
+                          {sendingMessageId === item.id ? (
+                            <Spinner animation="border" size="sm" />
+                          ) : (
+                            <i className="bi bi-whatsapp"></i>
+                          )}
+                        </Button>
                         <Button
                           variant="outline-primary"
                           size="sm"
@@ -373,6 +424,13 @@ export default function CreditPage() {
         onHide={() => { setShowModal(false); setEditingRecord(null); }}
         record={editingRecord}
         onSaved={onSaved}
+      />
+
+      {/* --- HISTORY MODAL --- */}
+      <CreditHistoryModal
+        show={showHistoryModal}
+        onHide={() => { setShowHistoryModal(false); setHistoryRecord(null); }}
+        credit={historyRecord}
       />
     </Container>
   );

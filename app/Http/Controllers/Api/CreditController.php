@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Credit;
 use App\Models\User;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -152,6 +153,49 @@ class CreditController extends Controller
         $this->authorizeAccess($credit, $request->user());
         $credit->delete();
         return response()->json(['message' => 'Credit record deleted successfully.']);
+    }
+
+    /**
+     * Send a WhatsApp reminder for an outstanding credit.
+     */
+    public function sendMessage(Credit $credit, Request $request, WhatsAppService $whatsAppService)
+    {
+        $this->authorizeAccess($credit, $request->user());
+
+        if (!$credit->mobile) {
+            return response()->json(['message' => 'No mobile number associated with this record.'], 400);
+        }
+
+        $message = "प्रिय ग्राहक {$credit->name},\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
+
+        $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message);
+
+        if ($success) {
+            return response()->json(['message' => 'WhatsApp reminder sent successfully.']);
+        }
+
+        return response()->json(['message' => 'Failed to send WhatsApp message. Please check logs.'], 500);
+    }
+
+    /**
+     * Retrieve transaction history for a customer.
+     */
+    public function history(Credit $credit, Request $request)
+    {
+        $this->authorizeAccess($credit, $request->user());
+
+        $query = Credit::query()
+            ->with('user:id,name')
+            ->where(function($q) use ($credit) {
+                if ($credit->mobile) {
+                    $q->where('mobile', $credit->mobile);
+                } else {
+                    $q->where('name', $credit->name);
+                }
+            })
+            ->orderByDesc('id');
+
+        return response()->json($query->get());
     }
 
     /**

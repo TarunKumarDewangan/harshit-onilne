@@ -111,6 +111,8 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
     Route::resource('dl', DrivingLicenseController::class)->except(['index', 'create', 'edit', 'store']);
     Route::resource('vehicles', VehicleController::class)->except(['index', 'create', 'edit', 'store']);
     Route::resource('credits', CreditController::class)->except(['create', 'edit']);
+    Route::post('/credits/{credit}/send-message', [CreditController::class, 'sendMessage']);
+    Route::get('/credits/{credit}/history', [CreditController::class, 'history']);
 
     // Nested by Citizen
     Route::get('/citizens/{citizen}/ll', [LearnerLicenseController::class, 'indexByCitizen']);
