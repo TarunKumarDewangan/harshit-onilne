@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Table, Spinner, Alert, Row, Col, Card } from 'react-bootstrap';
+import { Modal, Table, Spinner, Alert, Row, Col, Card, Button } from 'react-bootstrap';
 import api from '../services/apiClient';
 
 const formatDate = (dateString) => {
@@ -15,7 +15,7 @@ const formatDate = (dateString) => {
   }
 };
 
-export default function CreditHistoryModal({ show, onHide, credit }) {
+export default function CreditHistoryModal({ show, onHide, credit, onAddEntry }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -54,11 +54,24 @@ export default function CreditHistoryModal({ show, onHide, credit }) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="bg-light">
-        {credit?.mobile && (
-          <div className="mb-3 text-muted">
-            <strong>Mobile:</strong> {credit.mobile}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            {credit?.mobile ? (
+              <span className="text-muted">
+                <strong>Mobile:</strong> {credit.mobile}
+              </span>
+            ) : (
+              <span className="text-muted italic">No mobile number</span>
+            )}
           </div>
-        )}
+          <Button 
+            variant="primary" 
+            size="sm"
+            onClick={() => onAddEntry(credit.name, credit.mobile)}
+          >
+            + Add Entry for this Customer
+          </Button>
+        </div>
 
         {loading && (
           <div className="text-center py-5">

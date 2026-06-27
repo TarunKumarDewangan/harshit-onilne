@@ -144,6 +144,12 @@ export default function CreditPage() {
     fetchCredits(meta?.current_page || 1, search, perPage, sortBy, sortOrder, onlyBalance);
   };
 
+  const handleAddForPerson = (name, mobile) => {
+    setShowHistoryModal(false);
+    setEditingRecord({ name, mobile });
+    setShowModal(true);
+  };
+
   // Sort click handler
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -431,6 +437,7 @@ export default function CreditPage() {
         show={showHistoryModal}
         onHide={() => { setShowHistoryModal(false); setHistoryRecord(null); }}
         credit={historyRecord}
+        onAddEntry={handleAddForPerson}
       />
     </Container>
   );

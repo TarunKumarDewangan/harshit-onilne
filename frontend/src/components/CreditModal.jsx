@@ -54,7 +54,7 @@ export default function CreditModal({ show, onHide, record, onSaved }) {
     };
 
     try {
-      if (record) {
+      if (record && record.id) {
         await api.put(`/credits/${record.id}`, payload);
         toast.success('Credit record updated successfully');
       } else {
@@ -77,7 +77,7 @@ export default function CreditModal({ show, onHide, record, onSaved }) {
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
-          <Modal.Title>{record ? 'Edit' : 'Add'} Credit Record</Modal.Title>
+          <Modal.Title>{record && record.id ? 'Edit' : 'Add'} Credit Record</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Row className="g-3 mb-3">
