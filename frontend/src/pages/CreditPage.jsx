@@ -443,6 +443,7 @@ export default function CreditPage() {
         onAddEntry={handleAddForPerson}
         onEdit={handleEditFromHistory}
         onDelete={handleDeleteFromHistory}
+        onSaved={onSaved}
       />
     </Container>
   );

@@ -185,7 +185,7 @@ class CreditController extends Controller
 
         $message = "प्रिय ग्राहक {$credit->name},\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
 
-        $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message);
+        $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message, 'Credit');
 
         if ($success) {
             return response()->json(['message' => 'WhatsApp reminder sent successfully.']);

@@ -56,7 +56,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $ll->expiry_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके लर्नर लाइसेंस ({$ll->ll_no}) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'LL');
             }
         }
     }
@@ -73,7 +73,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $dl->expiry_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके ड्राइविंग लाइसेंस ({$dl->dl_no}) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'DL');
             }
         }
     }
@@ -90,7 +90,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $ins->end_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$ins->vehicle->registration_no} के बीमा (Insurance) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }
@@ -107,7 +107,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $pucc->valid_until;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$pucc->vehicle->registration_no} के पी.यू.सी.सी. (PUCC) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }
@@ -124,7 +124,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $fitness->expiry_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$fitness->vehicle->registration_no} के फिटनेस सर्टिफिकेट (Fitness) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }
@@ -141,7 +141,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $tax->tax_upto;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$tax->vehicle->registration_no} के रोड टैक्स (Road Tax) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }
@@ -158,7 +158,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $permit->expiry_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$permit->vehicle->registration_no} के परमिट (Permit) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }
@@ -175,7 +175,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $vltd->expiry_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$vltd->vehicle->registration_no} के वी.एल.टी.डी. सर्टिफिकेट (VLTd) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }
@@ -192,7 +192,7 @@ class SendExpiryNotifications extends Command
                 $expiryDate = $sg->expiry_date;
                 // --- END OF THE FIX ---
                 $message = "प्रिय ग्राहक\nआपके वाहन {$sg->vehicle->registration_no} के स्पीड गवर्नर सर्टिफिकेट (Speed Governor) की वैधता\n{$expiryDate} को समाप्त हो जाएगा।\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-                $service->sendTextMessage('91' . $citizen->mobile, $message);
+                $service->sendTextMessage('91' . $citizen->mobile, $message, 'Vehicle INC');
             }
         }
     }

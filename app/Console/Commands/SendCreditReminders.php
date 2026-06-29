@@ -37,7 +37,7 @@ class SendCreditReminders extends Command
             if ($days > 0 && $days % 7 === 0) {
                 $message = "प्रिय ग्राहक {$credit->name},\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
                 
-                $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message);
+                $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message, 'Credit');
                 if ($success) {
                     $sentCount++;
                     $this->line("Sent reminder to {$credit->name} ({$credit->mobile}) - Day {$days}");

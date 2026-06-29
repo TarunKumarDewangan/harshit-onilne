@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\DatabaseBackupController;
 use App\Http\Controllers\Api\DocumentInquiryController;
 use App\Http\Controllers\Api\LlRegistryController;
 use App\Http\Controllers\Api\CreditController;
+use App\Http\Controllers\Api\WhatsAppLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,9 @@ Route::middleware(['auth:sanctum', 'throttle:api_high'])->group(function () {
     Route::get('/global-search', [GlobalSearchController::class, 'search']);
 
     Route::get('/reports/expiries', [ExpiryReportController::class, 'index'])
+        ->middleware(RoleMiddleware::class . ':admin,manager');
+
+    Route::get('/whatsapp-logs', [WhatsAppLogController::class, 'index'])
         ->middleware(RoleMiddleware::class . ':admin,manager');
 
     Route::post('/reports/expiries/send-notification', [ExpiryReportController::class, 'sendManualNotification'])

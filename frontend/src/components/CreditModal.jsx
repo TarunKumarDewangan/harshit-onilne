@@ -12,6 +12,45 @@ export default function CreditModal({ show, onHide, record, onSaved }) {
     given_amount: 0
   });
   const [saving, setSaving] = useState(false);
+  const [contactsSupported, setContactsSupported] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'contacts' in navigator && 'ContactsManager' in window) {
+      setContactsSupported(true);
+    }
+  }, []);
+
+  const handlePickContact = async () => {
+    try {
+      const props = ['name', 'tel'];
+      const options = { multiple: false };
+      const picked = await navigator.contacts.select(props, options);
+      
+      if (picked && picked.length > 0) {
+        const contact = picked[0];
+        const name = contact.name && contact.name.length > 0 ? contact.name[0] : '';
+        let rawPhone = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
+        
+        // Extract only digits
+        const digits = rawPhone.replace(/\D/g, '');
+        // Slice last 10 digits
+        const cleanPhone = digits.length >= 10 ? digits.slice(-10) : digits;
+
+        setForm(prev => ({
+          ...prev,
+          name: name || prev.name,
+          mobile: cleanPhone || prev.mobile
+        }));
+
+        toast.success(`Imported: ${name} (${cleanPhone})`);
+      }
+    } catch (err) {
+      console.error('Contact Pick API error:', err);
+      if (err.name !== 'AbortError') {
+        toast.error('Failed to import contact.');
+      }
+    }
+  };
 
   useEffect(() => {
     if (record) {
@@ -97,14 +136,21 @@ export default function CreditModal({ show, onHide, record, onSaved }) {
             <Col md={6}>
               <Form.Group>
                 <Form.Label>Mobile No</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="mobile"
-                  value={form.mobile}
-                  onChange={handleChange}
-                  placeholder="Enter mobile number"
-                  maxLength={10}
-                />
+                <div className="d-flex gap-2">
+                  <Form.Control
+                    type="text"
+                    name="mobile"
+                    value={form.mobile}
+                    onChange={handleChange}
+                    placeholder="Enter 10 digit number"
+                    maxLength={10}
+                  />
+                  {contactsSupported && (
+                    <Button variant="outline-primary" onClick={handlePickContact} type="button" title="Import from Contacts">
+                      Import
+                    </Button>
+                  )}
+                </div>
               </Form.Group>
             </Col>
           </Row>

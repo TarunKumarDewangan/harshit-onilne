@@ -50,7 +50,7 @@ class DocumentInquiryController extends Controller
                 "Phone: " . $inquiry->phone . "\n" .
                 "Vehicle No: " . $vehicleNumber . "\n" .
                 "Documents: " . $documents;
-            $whatsAppService->sendTextMessage($recipient, $message);
+            $whatsAppService->sendTextMessage($recipient, $message, 'Other');
         }
 
         return response()->json($inquiry, 201);

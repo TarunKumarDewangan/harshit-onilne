@@ -244,8 +244,18 @@ class ExpiryReportController extends Controller
 
         $message .= "\n\nसमय पर नवीनीकरण कराएं और\nचालान/क्लेम रिजेक्शन से बचें\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
 
+        // Determine category
+        $category = 'Other';
+        if ($docType === 'Learner License') {
+            $category = 'LL';
+        } elseif ($docType === 'Driving License') {
+            $category = 'DL';
+        } else {
+            $category = 'Vehicle INC';
+        }
+
         // Send the message
-        $success = $whatsAppService->sendTextMessage($phoneNumber, $message);
+        $success = $whatsAppService->sendTextMessage($phoneNumber, $message, $category);
 
         if ($success) {
             return response()->json(['message' => 'Notification sent successfully.']);

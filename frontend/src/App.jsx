@@ -32,6 +32,7 @@ import AdminInquiriesPage from './pages/AdminInquiriesPage';
 import './Responsive.css';
 import LLRegistryPage from './pages/LLRegistryPage';
 import CreditPage from './pages/CreditPage';
+import WhatsAppLogsPage from './pages/WhatsAppLogsPage';
 
 
 function Shell({ children }) {
@@ -58,9 +59,14 @@ function Shell({ children }) {
                   {/* --- START OF THE FIX --- */}
                   {/* Added explicit menu item for Expiry Report for Admins/Managers */}
                   {isAdminOrManager && (
-                    <Nav.Link as={Link} to="/reports/expiries" className="fw-bold text-danger">
-                      Expiry Report
-                    </Nav.Link>
+                    <>
+                      <Nav.Link as={Link} to="/reports/expiries" className="fw-bold text-danger">
+                        Expiry Report
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/admin/wa-logs" className="fw-bold text-info">
+                        WA Logs
+                      </Nav.Link>
+                    </>
                   )}
                   {/* --- END OF THE FIX --- */}
 
@@ -138,6 +144,10 @@ export default function App() {
         <Route
           path="/reports/expiries"
           element={<PrivateRoute roles={['admin', 'manager']}><ExpiryReportPage /></PrivateRoute>}
+        />
+        <Route
+          path="/admin/wa-logs"
+          element={<PrivateRoute roles={['admin', 'manager']}><WhatsAppLogsPage /></PrivateRoute>}
         />
 
         <Route path="/search/ll" element={<PrivateRoute><LLSearchPage /></PrivateRoute>} />

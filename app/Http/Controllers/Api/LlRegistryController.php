@@ -163,7 +163,7 @@ class LlRegistryController extends Controller
         $message .= "HARSHIT RTO & INSURANCE SERVICES \n 8516941730 | 7000175067\n\n\n\n";
         $message .= "ड्राइविंग लाइसेंस बनाने का समय:बुधवार एवं गुरुवार \nसमय: सुबह 11 बजे से दोपहर 2 बजे तक";
 
-        $success = $whatsAppService->sendTextMessage('91' . $record->mobile, $message);
+        $success = $whatsAppService->sendTextMessage('91' . $record->mobile, $message, 'LL');
 
         if ($success) {
             return response()->json(['message' => 'Message sent successfully']);

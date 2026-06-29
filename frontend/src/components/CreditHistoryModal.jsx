@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Modal, Table, Spinner, Alert, Row, Col, Card, Button } from 'react-bootstrap';
+import { Modal, Table, Spinner, Alert, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import api from '../services/apiClient';
 
 const formatDate = (dateString) => {
@@ -15,13 +16,20 @@ const formatDate = (dateString) => {
   }
 };
 
-export default function CreditHistoryModal({ show, onHide, credit, onAddEntry, onEdit, onDelete }) {
+export default function CreditHistoryModal({ show, onHide, credit, onAddEntry, onEdit, onDelete, onSaved }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Overall payment state
+  const [overallAmount, setOverallAmount] = useState('');
+  const [overallNote, setOverallNote] = useState('');
+  const [recordingPayment, setRecordingPayment] = useState(false);
+
   useEffect(() => {
     if (show && credit) {
+      setOverallAmount('');
+      setOverallNote('');
       const fetchHistory = async () => {
         setLoading(true);
         setError('');
@@ -38,8 +46,45 @@ export default function CreditHistoryModal({ show, onHide, credit, onAddEntry, o
       fetchHistory();
     } else {
       setHistory([]);
+      setOverallAmount('');
+      setOverallNote('');
     }
   }, [show, credit]);
+
+  const handleOverallPaymentSubmit = async (e) => {
+    e.preventDefault();
+    const amount = Number(overallAmount);
+    if (!amount || amount <= 0) {
+      toast.error('Please enter a valid payment amount');
+      return;
+    }
+    setRecordingPayment(true);
+    try {
+      const payload = {
+        name: credit.name,
+        mobile: credit.mobile || null,
+        work_done: overallNote.trim() || 'Overall Payment',
+        total_amount: 0,
+        given_amount: amount
+      };
+      await api.post('/credits', payload);
+      toast.success('Overall payment recorded successfully');
+      setOverallAmount('');
+      setOverallNote('');
+      // Refresh local history
+      const { data } = await api.get(`/credits/${credit.id}/history`);
+      setHistory(data || []);
+      // Notify parent list to refresh
+      if (onSaved) {
+        onSaved();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to record overall payment.');
+    } finally {
+      setRecordingPayment(false);
+    }
+  };
 
   // Aggregate totals
   const totalCharged = history.reduce((sum, h) => sum + Number(h.total_amount), 0);
@@ -111,6 +156,48 @@ export default function CreditHistoryModal({ show, onHide, credit, onAddEntry, o
                 </Card>
               </Col>
             </Row>
+
+            {/* Quick Receive Overall Payment */}
+            <Card className="mb-4 border-0 shadow-sm">
+              <Card.Body className="py-3 bg-white rounded">
+                <h6 className="mb-3 text-secondary fw-semibold">Receive Overall Payment (General)</h6>
+                <Form onSubmit={handleOverallPaymentSubmit}>
+                  <Row className="g-2">
+                    <Col xs={12} sm={5}>
+                      <Form.Control
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        placeholder="Amount (₹) *"
+                        value={overallAmount}
+                        onChange={(e) => setOverallAmount(e.target.value)}
+                        required
+                        disabled={recordingPayment}
+                      />
+                    </Col>
+                    <Col xs={12} sm={4}>
+                      <Form.Control
+                        type="text"
+                        placeholder="Payment Mode / Note (e.g. Cash)"
+                        value={overallNote}
+                        onChange={(e) => setOverallNote(e.target.value)}
+                        disabled={recordingPayment}
+                      />
+                    </Col>
+                    <Col xs={12} sm={3}>
+                      <Button 
+                        type="submit" 
+                        variant="success" 
+                        className="w-100 fw-bold"
+                        disabled={recordingPayment || !overallAmount}
+                      >
+                        {recordingPayment ? 'Recording...' : 'Record Payment'}
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+              </Card.Body>
+            </Card>
 
             {/* History Table */}
             <Card className="border-0 shadow-sm">

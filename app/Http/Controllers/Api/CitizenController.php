@@ -144,7 +144,7 @@ class CitizenController extends Controller
 
         $phoneNumber = '91' . $citizen->mobile;
         $message = $data['message'];
-        $success = $whatsAppService->sendTextMessage($phoneNumber, $message);
+        $success = $whatsAppService->sendTextMessage($phoneNumber, $message, 'Other');
 
         if ($success) {
             return response()->json(['message' => 'Message sent successfully to ' . $citizen->mobile]);
