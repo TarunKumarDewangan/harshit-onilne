@@ -249,7 +249,8 @@ export default function CitizenProfile() {
                 <tr>
                   <th>#</th>
                   <th>Registration</th>
-                  <th style={{ minWidth: '600px' }}>Validities & Actions</th>
+                  <th style={{ minWidth: '520px' }}>Validities</th>
+                  <th>Action</th>
                   <th>Type</th>
                   <th>Make/Model</th>
                   <th>Chassis</th>
@@ -265,25 +266,23 @@ export default function CitizenProfile() {
                         <div className="fw-bold">{r.registration_no}</div>
                       </td>
                       <td>
-                        <div className="vehicle-actions-cell">
-                            {/* Validity Buttons with Dates - single row */}
-                            <div className="d-flex" style={{ gap: '0.6rem', flexWrap: 'nowrap' }}>
-                                <ValidityButton label="Tax" date={r.latest_tax_expiry} onClick={() => { setTaxVehicle(r); setShowTax(true); }} />
-                                <ValidityButton label="Ins" date={r.latest_insurance_expiry} onClick={() => handleShowInsurance(r)} variant="outline-info" />
-                                <ValidityButton label="PUCC" date={r.latest_pucc_expiry} onClick={() => handleShowPucc(r)} variant="outline-success" />
-                                <ValidityButton label="Fit" date={r.latest_fitness_expiry} onClick={() => handleShowFitness(r)} />
-                                <ValidityButton label="VLTd" date={r.latest_vltd_expiry} onClick={() => handleShowVltd(r)} />
-                                <ValidityButton label="Permit" date={r.latest_permit_expiry} onClick={() => handleShowPermit(r)} />
-                                <ValidityButton label="Speed" date={r.latest_speed_governor_expiry} onClick={() => handleShowSpeedGovernor(r)} />
-                            </div>
-
-                            {/* Action Buttons - separate row below */}
-                            <div className="d-flex vehicle-edit-delete-row">
-                                <Button variant="outline-primary" size="sm" onClick={() => handleVehEdit(r)}>Edit</Button>
-                                {isAdmin && (
-                                    <Button variant="outline-danger" size="sm" onClick={() => handleVehDelete(r.id)}>Delete</Button>
-                                )}
-                            </div>
+                        {/* Validity Buttons with Dates - single row */}
+                        <div className="d-flex" style={{ gap: '0.6rem', flexWrap: 'nowrap' }}>
+                            <ValidityButton label="Tax" date={r.latest_tax_expiry} onClick={() => { setTaxVehicle(r); setShowTax(true); }} />
+                            <ValidityButton label="Ins" date={r.latest_insurance_expiry} onClick={() => handleShowInsurance(r)} variant="outline-info" />
+                            <ValidityButton label="PUCC" date={r.latest_pucc_expiry} onClick={() => handleShowPucc(r)} variant="outline-success" />
+                            <ValidityButton label="Fit" date={r.latest_fitness_expiry} onClick={() => handleShowFitness(r)} />
+                            <ValidityButton label="VLTd" date={r.latest_vltd_expiry} onClick={() => handleShowVltd(r)} />
+                            <ValidityButton label="Permit" date={r.latest_permit_expiry} onClick={() => handleShowPermit(r)} />
+                            <ValidityButton label="Speed" date={r.latest_speed_governor_expiry} onClick={() => handleShowSpeedGovernor(r)} />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex vehicle-edit-delete-row">
+                            <Button variant="outline-primary" size="sm" onClick={() => handleVehEdit(r)}>Edit</Button>
+                            {isAdmin && (
+                                <Button variant="outline-danger" size="sm" onClick={() => handleVehDelete(r.id)}>Delete</Button>
+                            )}
                         </div>
                       </td>
                       <td>{r.type || '-'}</td>
@@ -293,7 +292,7 @@ export default function CitizenProfile() {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={7} className="text-center">No records</td></tr>
+                  <tr><td colSpan={8} className="text-center">No records</td></tr>
                 )}
               </tbody>
             </Table>

@@ -4,16 +4,9 @@ body {
     overflow-x: hidden;
 }
 
-/* Citizen Profile - Vehicle row: validity buttons row + edit/delete row */
-.vehicle-actions-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
+/* Citizen Profile - Vehicle row: Edit/Delete action column */
 .vehicle-edit-delete-row {
     gap: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid #e9ecef;
 }
 
 /* Media Query for Mobile Devices (tablets and phones, screen width < 768px) */
@@ -56,12 +49,14 @@ body {
     }
 
     /* Citizen Profile - Vehicle Table */
-    .vehicle-table th:nth-child(4), /* Hides Make/Model */
-    .vehicle-table td:nth-child(4),
-    .vehicle-table th:nth-child(5), /* Hides Chassis */
+    .vehicle-table th:nth-child(5), /* Hides Type */
     .vehicle-table td:nth-child(5),
-    .vehicle-table th:nth-child(6), /* Hides Engine */
-    .vehicle-table td:nth-child(6) {
+    .vehicle-table th:nth-child(6), /* Hides Make/Model */
+    .vehicle-table td:nth-child(6),
+    .vehicle-table th:nth-child(7), /* Hides Chassis */
+    .vehicle-table td:nth-child(7),
+    .vehicle-table th:nth-child(8), /* Hides Engine */
+    .vehicle-table td:nth-child(8) {
         display: none;
     }
 
