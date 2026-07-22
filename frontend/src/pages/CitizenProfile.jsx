@@ -27,19 +27,19 @@ import VehicleTaxEditModal from '../components/VehicleTaxEditModal';
 
 // Helper component with EVEN LARGER SIZES
 const ValidityButton = ({ label, date, onClick, variant = 'outline-secondary' }) => (
-    <div className="d-flex flex-column align-items-center" style={{ minWidth: '100px' }}>
+    <div className="d-flex flex-column align-items-center" style={{ minWidth: '68px' }}>
         <Button
             size="sm"
             variant={variant}
             onClick={onClick}
             className="w-100 fw-bold"
-            style={{ fontSize: '1rem', padding: '6px 10px' }}
+            style={{ fontSize: '0.8rem', padding: '4px 6px' }}
         >
             {label}
         </Button>
         <small
             className="text-dark fw-bold mt-1"
-            style={{ fontSize: '0.95rem', whiteSpace: 'nowrap' }}
+            style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}
         >
             {date || '-'}
         </small>
@@ -249,7 +249,7 @@ export default function CitizenProfile() {
                 <tr>
                   <th>#</th>
                   <th>Registration</th>
-                  <th style={{ minWidth: '750px' }}>Validities & Actions</th> {/* Increased width container */}
+                  <th style={{ minWidth: '600px' }}>Validities & Actions</th>
                   <th>Type</th>
                   <th>Make/Model</th>
                   <th>Chassis</th>
@@ -265,9 +265,9 @@ export default function CitizenProfile() {
                         <div className="fw-bold">{r.registration_no}</div>
                       </td>
                       <td>
-                        <div className="d-flex align-items-center" style={{ gap: '0.75rem' }}>
-                            {/* Validity Buttons with Dates */}
-                            <div className="d-flex" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
+                        <div className="vehicle-actions-cell">
+                            {/* Validity Buttons with Dates - single row */}
+                            <div className="d-flex" style={{ gap: '0.6rem', flexWrap: 'nowrap' }}>
                                 <ValidityButton label="Tax" date={r.latest_tax_expiry} onClick={() => { setTaxVehicle(r); setShowTax(true); }} />
                                 <ValidityButton label="Ins" date={r.latest_insurance_expiry} onClick={() => handleShowInsurance(r)} variant="outline-info" />
                                 <ValidityButton label="PUCC" date={r.latest_pucc_expiry} onClick={() => handleShowPucc(r)} variant="outline-success" />
@@ -277,15 +277,13 @@ export default function CitizenProfile() {
                                 <ValidityButton label="Speed" date={r.latest_speed_governor_expiry} onClick={() => handleShowSpeedGovernor(r)} />
                             </div>
 
-                            <div className="vr mx-2" style={{height: '50px'}}></div>
-
-                            {/* Action Buttons */}
-                            <ButtonGroup vertical>
+                            {/* Action Buttons - separate row below */}
+                            <div className="d-flex vehicle-edit-delete-row">
                                 <Button variant="outline-primary" size="sm" onClick={() => handleVehEdit(r)}>Edit</Button>
                                 {isAdmin && (
                                     <Button variant="outline-danger" size="sm" onClick={() => handleVehDelete(r.id)}>Delete</Button>
                                 )}
-                            </ButtonGroup>
+                            </div>
                         </div>
                       </td>
                       <td>{r.type || '-'}</td>

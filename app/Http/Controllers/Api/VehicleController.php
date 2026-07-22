@@ -23,9 +23,11 @@ class VehicleController extends Controller
     // GET /api/citizens/{citizen}/vehicles
     public function indexByCitizen(Citizen $citizen)
     {
-        return Vehicle::where('citizen_id', $citizen->id)
+        $vehicles = Vehicle::where('citizen_id', $citizen->id)
             ->orderByDesc('id')
-            ->paginate(10);
+            ->get();
+
+        return response()->json(['data' => $vehicles]);
     }
 
     // GET /api/search/vehicle?registration_no=..&chassis_no=..&engine_no=..

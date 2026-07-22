@@ -35,7 +35,7 @@ class SendCreditReminders extends Command
 
             // Send reminder on day 7, 14, 21, 28, etc. (multiples of 7 and > 0)
             if ($days > 0 && $days % 7 === 0) {
-                $message = "प्रिय ग्राहक {$credit->name},\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
+                $message = "प्रिय ग्राहक,\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
                 
                 $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message, 'Credit');
                 if ($success) {

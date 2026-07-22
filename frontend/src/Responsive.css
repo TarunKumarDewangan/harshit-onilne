@@ -4,6 +4,18 @@ body {
     overflow-x: hidden;
 }
 
+/* Citizen Profile - Vehicle row: validity buttons row + edit/delete row */
+.vehicle-actions-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.vehicle-edit-delete-row {
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
 /* Media Query for Mobile Devices (tablets and phones, screen width < 768px) */
 @media (max-width: 767.98px) {
     /* --- GLOBAL STYLES --- */
