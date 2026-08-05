@@ -60,6 +60,12 @@ export default function ExpiryReportPage() {
       const filtersToUse = currentFilters || filters;
       const params = { ...filtersToUse, page };
 
+      if (params.only_expired) {
+        params.only_expired = 1;
+      } else {
+        delete params.only_expired;
+      }
+
       Object.keys(params).forEach(key => {
         if (params[key] === '' || params[key] === null || params[key] === undefined) {
           delete params[key];

@@ -34,7 +34,7 @@ class ExpiryReportController extends Controller
             'owner_name' => 'nullable|string|max:255',
             'exact_date' => 'nullable|date',
             'doc_type' => 'nullable|string|max:255',
-            'only_expired' => 'nullable|boolean',
+            'only_expired' => 'nullable|in:0,1,true,false',
         ]);
         $vehicleNo = $filters['vehicle_no'] ?? null;
         $ownerName = $filters['owner_name'] ?? null;
