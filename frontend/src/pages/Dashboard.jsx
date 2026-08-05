@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Container, Row, Col, Card, Spinner, Alert, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert, Button, Table, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/apiClient';
@@ -37,6 +37,8 @@ export default function Dashboard() {
   const [userStats, setUserStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [upcomingExpiries, setUpcomingExpiries] = useState([]);
+  const [upcomingLoading, setUpcomingLoading] = useState(true);
 
   const isAdminOrManager = useMemo(() => user && ['admin', 'manager'].includes(user.role), [user]);
 
@@ -55,6 +57,24 @@ export default function Dashboard() {
       }
     };
     if (user) fetchStats();
+  }, [user, isAdminOrManager]);
+
+  useEffect(() => {
+    const fetchUpcomingExpiries = async () => {
+      setUpcomingLoading(true);
+      try {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const { data } = await api.get('/reports/expiries', {
+          params: { start_date: todayStr, per_page: 10, page: 1 },
+        });
+        setUpcomingExpiries(Array.isArray(data.data) ? data.data : []);
+      } catch (e) {
+        // Non-critical widget; fail silently.
+      } finally {
+        setUpcomingLoading(false);
+      }
+    };
+    if (user && isAdminOrManager) fetchUpcomingExpiries();
   }, [user, isAdminOrManager]);
 
   const renderAdminDashboard = () => (
@@ -129,6 +149,49 @@ export default function Dashboard() {
             </Card>
         </Col>
       </Row>
+
+      <div className="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <h5 className="text-muted mb-0">Nearest Upcoming Expiries</h5>
+        <Link to="/reports/expiries" className="small fw-bold text-decoration-none">View Full Report &rarr;</Link>
+      </div>
+      <Card className="border-0 shadow-sm">
+        <Card.Body className="p-0">
+          <div className="table-responsive">
+            <Table hover size="sm" className="mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>Owner Name</th>
+                  <th>Mobile</th>
+                  <th>Doc. Type</th>
+                  <th>Identifier / No.</th>
+                  <th>Expiry Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcomingLoading && (
+                  <tr><td colSpan={5} className="text-center py-3"><Spinner size="sm" /></td></tr>
+                )}
+                {!upcomingLoading && upcomingExpiries.length === 0 && (
+                  <tr><td colSpan={5} className="text-center py-3 text-muted">No upcoming expiries found.</td></tr>
+                )}
+                {!upcomingLoading && upcomingExpiries.map((item) => (
+                  <tr key={`${item.type}-${item.record_id}`}>
+                    <td>
+                      {item.citizen_id ? (
+                        <Link to={`/citizens/${item.citizen_id}`}>{item.owner_name || 'N/A'}</Link>
+                      ) : (item.owner_name || 'N/A')}
+                    </td>
+                    <td>{item.owner_mobile || '-'}</td>
+                    <td><Badge bg={item.type === 'Insurance' ? 'success' : 'warning'} text="dark">{item.type || 'N/A'}</Badge></td>
+                    <td>{item.identifier || 'N/A'}</td>
+                    <td>{item.expiry_date || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        </Card.Body>
+      </Card>
     </>
   );
 

@@ -34,17 +34,23 @@ class ExpiryReportController extends Controller
             'owner_name' => 'nullable|string|max:255',
             'exact_date' => 'nullable|date',
             'doc_type' => 'nullable|string|max:255',
+            'only_expired' => 'nullable|boolean',
         ]);
         $vehicleNo = $filters['vehicle_no'] ?? null;
         $ownerName = $filters['owner_name'] ?? null;
         $exactDate = isset($filters['exact_date']) ? Carbon::parse($filters['exact_date']) : null;
         $docType = $filters['doc_type'] ?? null;
+        $onlyExpired = $request->boolean('only_expired');
         if ($exactDate) {
             $startDate = $exactDate->copy()->startOfDay();
             $endDate = $exactDate->copy()->endOfDay();
         } else {
             $startDate = isset($filters['start_date']) ? Carbon::parse($filters['start_date']) : null;
             $endDate = isset($filters['end_date']) ? Carbon::parse($filters['end_date']) : null;
+        }
+        if ($onlyExpired) {
+            $todayEnd = Carbon::today()->endOfDay();
+            $endDate = $endDate ? $endDate->min($todayEnd) : $todayEnd;
         }
         $page = $filters['page'] ?? 1;
         $perPage = $filters['per_page'] ?? 15;

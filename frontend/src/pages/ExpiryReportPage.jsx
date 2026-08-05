@@ -30,6 +30,7 @@ export default function ExpiryReportPage() {
     owner_name: '',
     exact_date: '',
     doc_type: '',
+    only_expired: false,
   });
   const [items, setItems] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -124,11 +125,18 @@ export default function ExpiryReportPage() {
   const handleReset = () => {
     const freshFilters = {
       vehicle_no: '', start_date: '', end_date: '',
-      owner_name: '', exact_date: '', doc_type: '',
+      owner_name: '', exact_date: '', doc_type: '', only_expired: false,
     };
     setFilters(freshFilters);
     setCurrentPage(1);
     fetchExpiries(1, freshFilters);
+  };
+
+  const handleToggleOnlyExpired = () => {
+    const newFilters = { ...filters, only_expired: !filters.only_expired };
+    setFilters(newFilters);
+    setCurrentPage(1);
+    fetchExpiries(1, newFilters);
   };
 
   const goPage = (p) => {
@@ -272,8 +280,16 @@ const handleSendNotice = async (item) => {
                       variant="outline-secondary"
                       onClick={handleReset}
                       disabled={loading}
+                      className="me-2"
                     >
                       Reset
+                    </Button>
+                    <Button
+                      variant={filters.only_expired ? 'danger' : 'outline-danger'}
+                      onClick={handleToggleOnlyExpired}
+                      disabled={loading}
+                    >
+                      {filters.only_expired ? 'Showing: Only Expired' : 'Show Only Expired'}
                     </Button>
                 </Col>
             </Row>
