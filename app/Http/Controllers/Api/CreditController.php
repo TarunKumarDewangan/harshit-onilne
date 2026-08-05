@@ -179,19 +179,22 @@ class CreditController extends Controller
     {
         $this->authorizeAccess($credit, $request->user());
 
-        if (!$credit->mobile) {
-            return response()->json(['message' => 'No mobile number associated with this record.'], 400);
-        }
+        // Credit WhatsApp reminders disabled per request (kept for easy re-enable):
+        return response()->json(['message' => 'Credit WhatsApp reminders are currently disabled.'], 400);
 
-        $message = "प्रिय ग्राहक,\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
-
-        $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message, 'Credit');
-
-        if ($success) {
-            return response()->json(['message' => 'WhatsApp reminder sent successfully.']);
-        }
-
-        return response()->json(['message' => 'Failed to send WhatsApp message. Please check logs.'], 500);
+        // if (!$credit->mobile) {
+        //     return response()->json(['message' => 'No mobile number associated with this record.'], 400);
+        // }
+        //
+        // $message = "प्रिय ग्राहक,\nआपके कार्य ({$credit->work_done}) की बकाया राशि ₹{$credit->balance_amount} लंबित है।\n\nकृपया जल्द से जल्द भुगतान करें।\n\nHARSHIT RTO & INSURANCE SERVICES\n7000175067 | 7999664014";
+        //
+        // $success = $whatsAppService->sendTextMessage('91' . $credit->mobile, $message, 'Credit');
+        //
+        // if ($success) {
+        //     return response()->json(['message' => 'WhatsApp reminder sent successfully.']);
+        // }
+        //
+        // return response()->json(['message' => 'Failed to send WhatsApp message. Please check logs.'], 500);
     }
 
     /**

@@ -27,16 +27,17 @@ class Kernel extends ConsoleKernel
                 \Log::info('Scheduler finished notifications at: ' . now());
             });
 
-        $schedule->command('notifications:send-credits')
-            ->dailyAt('10:00')
-            ->timezone('Asia/Kolkata')
-            ->appendOutputTo(storage_path('logs/scheduler.log'))
-            ->before(function () {
-                \Log::info('Scheduler starting credit reminders at: ' . now());
-            })
-            ->after(function () {
-                \Log::info('Scheduler finished credit reminders at: ' . now());
-            });
+        // Credit WhatsApp reminders disabled per request (kept for easy re-enable):
+        // $schedule->command('notifications:send-credits')
+        //     ->dailyAt('10:00')
+        //     ->timezone('Asia/Kolkata')
+        //     ->appendOutputTo(storage_path('logs/scheduler.log'))
+        //     ->before(function () {
+        //         \Log::info('Scheduler starting credit reminders at: ' . now());
+        //     })
+        //     ->after(function () {
+        //         \Log::info('Scheduler finished credit reminders at: ' . now());
+        //     });
     }
 
     /**
